@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Halaman Tidak Di Temukan | Kuotax</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="192x192" href="/icons/android-launchericon-192-192.png">
+    <link rel="shortcut icon" href="/icons/android-launchericon-192-192.png">
+
+    <link rel="stylesheet" href="/css/style.css?v=6">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .container {
+            animation: slideUp 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 min-h-screen flex items-center justify-center p-4">
+    <div class="container glass rounded-3xl shadow-2xl p-8 w-full max-w-md text-center">
+        <div class="flex justify-center mb-6">
+            <img src="/images/logoa.png" alt="Kuotax" class="h-20 w-auto">
+        </div>
+
+        <div class="text-8xl mb-4">🚫</div>
+
+        <div class="text-9xl font-bold bg-gradient-to-r from-red-500 to-pink-500 bg-clip-text text-transparent leading-none mb-6">
+            404
+        </div>
+
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">Halaman Tidak Di Temukan</h1>
+
+        <p class="text-gray-600 mb-8 leading-relaxed">
+            Maaf, Halaman yang anda cari tidak di temukan.
+        </p>
+
+        <a href="/" class="inline-block w-full py-3 rounded-lg bg-gradient-to-r from-emerald-600 to-green-600 text-white font-semibold hover:from-emerald-700 hover:to-green-700 transition shadow-lg">
+            <i class="fas fa-home"></i> Kembali ke Beranda
+        </a>
+    </div>
+</body>
+</html>

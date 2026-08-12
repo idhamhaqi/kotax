@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    
+    <!-- Meta tags for SEO & Social Sharing -->
+    <meta name="description" content="<%= description %>">
+    
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS (via compiled style.css) -->
+    <link rel="stylesheet" href="/css/style.css?v=6">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="antialiased text-slate-800">
+
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full z-50 top-0 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
+            <a href="/">
+                <img src="/images/logoa.png" alt="Kuotax" class="h-10 w-auto">
+            </a>
+            <div class="flex items-center gap-4">
+                <a href="/" class="text-sm font-bold text-slate-500 hover:text-emerald-600">
+                    <i class="fas fa-arrow-left"></i> Kembali ke Beranda
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="pt-32 pb-16 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 border-b-4 border-emerald-500 text-white relative overflow-hidden">
+        <!-- Abstract shapes -->
+        <div class="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 text-emerald-400 text-xs font-bold mb-6 uppercase tracking-widest">
+                <i class="fas fa-server"></i> API H2H B2B Only
+            </div>
+            <h1 class="text-4xl md:text-5xl font-extrabold mb-6 tracking-tight">Kemitraan API Server</h1>
+            <p class="text-lg md:text-xl text-slate-300 max-w-3xl mx-auto font-light leading-relaxed">
+                Hubungkan sistem server pulsa/PPOB Anda dengan infrastruktur Kuotax. Dapatkan akses likuiditas kuota nasional dengan <strong class="text-white">harga grosir termurah</strong> dan eksekusi instan tanpa *delay*.
+            </p>
+        </div>
+    </header>
+
+    <!-- Registration Content -->
+    <main class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid lg:grid-cols-12 gap-12">
+            
+            <!-- Information Column -->
+            <div class="lg:col-span-5 space-y-8">
+                <div>
+                    <h3 class="text-2xl font-extrabold text-slate-900 mb-4">Syarat & Ketentuan Mitra</h3>
+                    <p class="text-slate-600 mb-6 leading-relaxed">Pendaftaran API ini khusus untuk badan usaha atau pemilik server berskala menengah ke atas. Kami tidak melayani agen *retail* secara langsung via API.</p>
+                    
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                            <div>
+                                <strong class="block text-slate-900">Sistem Host-to-Host (H2H) Aktif</strong>
+                                <span class="text-sm text-slate-500">Anda harus sudah memiliki *software* server pulsa (misal: IRS, OtomaX, FM, dll).</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                            <div>
+                                <strong class="block text-slate-900">Minimum 2.000 Transaksi / Bulan</strong>
+                                <span class="text-sm text-slate-500">Volume transaksi *historical* minimal untuk kelayakan integrasi.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                            <div>
+                                <strong class="block text-slate-900">Security Deposit Rp 10.000.000</strong>
+                                <span class="text-sm text-slate-500">Deposit awal yang akan dialokasikan penuh sebagai saldo pemotongan transaksi.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fas fa-check-circle text-emerald-500 mt-1"></i>
+                            <div>
+                                <strong class="block text-slate-900">IP Static Whitelist</strong>
+                                <span class="text-sm text-slate-500">Sistem Anda harus menggunakan IP Statis publik untuk alasan keamanan.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+                    <h4 class="text-lg font-bold text-blue-900 mb-2">Bukan Pemilik Server?</h4>
+                    <p class="text-sm text-blue-800 mb-4">Jika Anda hanya pengguna individu yang ingin berinvestasi atau menjadi agen eksekutor (*Liquidity Provider*), Anda tidak perlu mendaftar di halaman ini.</p>
+                    <a href="/register" class="inline-block px-6 py-2.5 bg-white text-blue-600 font-bold text-sm rounded-lg border border-blue-200 hover:bg-blue-50 transition-colors shadow-sm">
+                        Daftar Sebagai Agen Eksekutor
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Registration Form Column -->
+            <div class="lg:col-span-7">
+                <div class="bg-white rounded-3xl p-8 border border-slate-200 shadow-xl">
+                    <h3 class="text-2xl font-extrabold text-slate-900 mb-2">Formulir Integrasi API</h3>
+                    <p class="text-slate-500 text-sm mb-8">Lengkapi data teknis di bawah ini. Tim kami akan menghubungi Anda setelah *review* selesai.</p>
+                    
+                    <form id="apiForm" class="space-y-6">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Nama Entitas / Perusahaan</label>
+                                <input type="text" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition" placeholder="PT / CV / Nama Server">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Kontak Penanggung Jawab (PIC)</label>
+                                <input type="text" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition" placeholder="Nama Lengkap PIC">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Email Bisnis</label>
+                                <input type="email" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition" placeholder="admin@domainanda.com">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Nomor WhatsApp Aktif</label>
+                                <input type="tel" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition" placeholder="0812xxxxxx">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Software Server yang Digunakan</label>
+                            <select class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition">
+                                <option>IRS (IndoVoucher)</option>
+                                <option>OtomaX</option>
+                                <option>FM / Flash Machine</option>
+                                <option>VRE</option>
+                                <option>TigaPutri</option>
+                                <option>Custom Buatan Sendiri</option>
+                                <option>Lainnya</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 mb-2">Alamat IP Statis (IPv4)</label>
+                            <input type="text" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition" placeholder="Contoh: 103.82.xxx.xxx" pattern="^([0-9]{1,3}\.){3}[0-9]{1,3}$">
+                            <p class="text-xs text-slate-400 mt-2">Untuk keperluan *whitelist* pada *firewall* kami.</p>
+                        </div>
+
+                        <div class="pt-4">
+                            <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2">
+                                <i class="fas fa-paper-plane"></i> Ajukan Integrasi API
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Unified Public Footer -->
+    <%- include('partials/public-footer') %>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div class="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl scale-95 opacity-0 transition-all duration-300" id="modalContent">
+            <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-check-circle text-emerald-500 text-4xl"></i>
+            </div>
+            <h3 class="text-2xl font-extrabold text-slate-900 mb-2">Aplikasi Diterima</h3>
+            <p class="text-slate-600 mb-8 text-sm leading-relaxed">Pengajuan integrasi API B2B Anda telah masuk ke sistem kami. Tim Teknis akan melakukan *review* dalam waktu maksimal <strong>14 Hari Kerja</strong>.</p>
+            <button onclick="closeModal()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-3 rounded-xl transition-colors">
+                Tutup
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('apiForm');
+        const modal = document.getElementById('successModal');
+        const modalContent = document.getElementById('modalContent');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Show modal
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Animate in
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+            
+            form.reset();
+        });
+
+        function closeModal() {
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                window.location.href = '/'; // redirect back to home
+            }, 300);
+        }
+    </script>
+</body>
+</html>

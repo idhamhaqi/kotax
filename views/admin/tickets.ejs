@@ -1,0 +1,329 @@
+<%- include('partials/header', { title: 'Support Tiket', page: 'tickets' }) %>
+
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+        <h2 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+            <i class="fas fa-headset text-indigo-600"></i> Support Tiket Pengguna
+        </h2>
+        <p class="text-xs text-gray-500 mt-1">Kelola dan tanggapi keluhan / tiket bantuan dari pengguna Kuotax</p>
+    </div>
+    <div class="flex items-center gap-2">
+        <button onclick="loadAdminTickets()" class="bg-indigo-50 text-indigo-700 hover:bg-indigo-100 border border-indigo-200 font-bold px-3 py-2 rounded-lg text-xs flex items-center gap-1.5 transition">
+            <i class="fas fa-sync-alt"></i> Refresh Data
+        </button>
+    </div>
+</div>
+
+<!-- FILTER TABS -->
+<div class="flex items-center gap-2 mb-6 overflow-x-auto pb-2 border-b border-gray-200">
+    <button onclick="filterTickets('all')" id="tab-all" class="ticket-tab active px-4 py-2 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-sm">
+        Semua Tiket
+    </button>
+    <button onclick="filterTickets('open')" id="tab-open" class="ticket-tab px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 flex items-center gap-1.5">
+        🟡 Menunggu Balasan <span id="badgeOpenCount" class="px-1.5 py-0.2 bg-amber-500 text-white rounded-full text-[10px] hidden">0</span>
+    </button>
+    <button onclick="filterTickets('answered')" id="tab-answered" class="ticket-tab px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-gray-600 border border-gray-200 hover:bg-gray-50">
+        🔵 Dibalas Admin
+    </button>
+    <button onclick="filterTickets('closed')" id="tab-closed" class="ticket-tab px-4 py-2 rounded-xl text-xs font-bold transition bg-white text-gray-600 border border-gray-200 hover:bg-gray-50">
+        🟢 Closed / Selesai
+    </button>
+</div>
+
+<!-- TICKETS TABLE CARD -->
+<div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    <th class="py-3.5 px-4">Kode Tiket</th>
+                    <th class="py-3.5 px-4">Pengguna</th>
+                    <th class="py-3.5 px-4">Kategori & Subjek</th>
+                    <th class="py-3.5 px-4">Prioritas</th>
+                    <th class="py-3.5 px-4">Status</th>
+                    <th class="py-3.5 px-4">Terakhir Update</th>
+                    <th class="py-3.5 px-4 text-right">Aksi</th>
+                </tr>
+            </thead>
+            <tbody id="adminTicketsTbody" class="divide-y divide-gray-100">
+                <tr>
+                    <td colspan="7" class="py-12 text-center text-gray-400 text-xs">
+                        <i class="fas fa-circle-notch fa-spin text-xl text-indigo-600 mb-2"></i>
+                        <p>Memuat daftar tiket...</p>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL / DRAWER: BALAS TIKET ADMIN -->
+<!-- ============================================ -->
+<div id="adminReplyModal" class="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-2 sm:p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-3xl w-full p-4 sm:p-6 shadow-2xl relative border border-gray-100 max-h-[95vh] flex flex-col">
+        <!-- Header -->
+        <div class="flex items-center justify-between pb-3 mb-3 border-b border-gray-100 shrink-0">
+            <div>
+                <div class="flex items-center gap-2">
+                    <span id="admDtCode" class="font-mono text-xs font-bold bg-indigo-100 text-indigo-800 px-2.5 py-0.5 rounded-md"></span>
+                    <span id="admDtCategory" class="text-xs font-bold bg-purple-50 text-purple-700 px-2 py-0.5 rounded border border-purple-100"></span>
+                    <span id="admDtStatusBadge"></span>
+                </div>
+                <h3 id="admDtSubject" class="text-base sm:text-lg font-bold text-gray-800 mt-1"></h3>
+                <div id="admDtUserInfo" class="text-xs text-gray-500 mt-0.5 flex items-center gap-2"></div>
+            </div>
+            <button onclick="closeAdminReplyModal()" class="text-gray-400 hover:text-gray-600 p-1">
+                <i class="fas fa-times text-xl"></i>
+            </button>
+        </div>
+
+        <!-- Thread Messages Area -->
+        <div id="admThreadMessagesContainer" class="flex-1 overflow-y-auto space-y-3 p-3 bg-gray-50 rounded-2xl mb-3 border border-gray-100 min-h-[250px] max-h-[450px]">
+            <!-- Messages rendered here -->
+        </div>
+
+        <!-- Reply Form Area -->
+        <div id="admReplyArea" class="shrink-0 pt-2 border-t border-gray-100">
+            <form id="admReplyForm" class="space-y-3">
+                <input type="hidden" id="admDtTicketId" value="">
+                
+                <textarea id="admReplyMessage" rows="3" required placeholder="Tulis balasan penjelasan atau instruksi penyelesaian untuk pengguna..." class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs sm:text-sm focus:bg-white focus:border-indigo-500 outline-none"></textarea>
+
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div class="flex items-center gap-3">
+                        <input type="file" id="admReplyAttachment" accept="image/*" class="text-xs text-gray-500 file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-gray-100 file:text-gray-700">
+                        
+                        <label class="flex items-center gap-1.5 text-xs text-gray-700 font-bold cursor-pointer selection:bg-none">
+                            <input type="checkbox" id="chkCloseTicket" class="rounded text-indigo-600 focus:ring-indigo-500">
+                            <span>Tandai Selesai (Closed)</span>
+                        </label>
+                    </div>
+
+                    <button type="submit" id="btnAdminSubmitReply" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold shadow-md transition flex items-center justify-center gap-1.5">
+                        <i class="fas fa-paper-plane"></i> Kirim Balasan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+let currentStatusFilter = 'all';
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadAdminTickets();
+
+    if (typeof adminSocket !== 'undefined') {
+        adminSocket.on('admin-new-ticket', () => { loadAdminTickets(); });
+        adminSocket.on('admin-ticket-updated', () => { loadAdminTickets(); });
+    }
+});
+
+function filterTickets(status) {
+    currentStatusFilter = status;
+    document.querySelectorAll('.ticket-tab').forEach(tab => {
+        tab.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm');
+        tab.classList.add('bg-white', 'text-gray-600', 'border', 'border-gray-200');
+    });
+    const activeTab = document.getElementById(`tab-${status}`);
+    if (activeTab) {
+        activeTab.classList.remove('bg-white', 'text-gray-600', 'border', 'border-gray-200');
+        activeTab.classList.add('bg-indigo-600', 'text-white', 'shadow-sm');
+    }
+    loadAdminTickets();
+}
+
+async function loadAdminTickets() {
+    const tbody = document.getElementById('adminTicketsTbody');
+
+    try {
+        const res = await fetch(`/api/admin/support/tickets?status=${currentStatusFilter}`);
+        const data = await res.json();
+
+        if (data.success) {
+            // Update open badge count
+            const badgeOpen = document.getElementById('badgeOpenCount');
+            if (data.openCount > 0) {
+                badgeOpen.textContent = data.openCount;
+                badgeOpen.classList.remove('hidden');
+            } else {
+                badgeOpen.classList.add('hidden');
+            }
+
+            if (data.tickets.length === 0) {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="py-12 text-center text-gray-400 text-xs">
+                        <i class="fas fa-inbox text-3xl mb-2 text-gray-300"></i>
+                        <p>Tidak ada tiket bantuan yang ditemukan.</p>
+                    </td>
+                </tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.tickets.map(t => {
+                let statusBadge = '';
+                if (t.status === 'open') {
+                    statusBadge = `<span class="px-2.5 py-0.5 bg-amber-100 text-amber-800 border border-amber-300 rounded-full text-[11px] font-bold"><i class="fas fa-clock mr-1"></i> Menunggu Balasan</span>`;
+                } else if (t.status === 'answered') {
+                    statusBadge = `<span class="px-2.5 py-0.5 bg-blue-100 text-blue-800 border border-blue-300 rounded-full text-[11px] font-bold"><i class="fas fa-reply mr-1"></i> Dibalas Admin</span>`;
+                } else {
+                    statusBadge = `<span class="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full text-[11px] font-bold"><i class="fas fa-check-circle mr-1"></i> Selesai</span>`;
+                }
+
+                let priorityBadge = '';
+                if (t.priority === 'high') {
+                    priorityBadge = `<span class="px-2 py-0.5 bg-red-100 text-red-800 font-bold rounded text-[10px]">Tinggi 🔥</span>`;
+                } else if (t.priority === 'low') {
+                    priorityBadge = `<span class="px-2 py-0.5 bg-gray-100 text-gray-600 font-medium rounded text-[10px]">Rendah</span>`;
+                } else {
+                    priorityBadge = `<span class="px-2 py-0.5 bg-blue-50 text-blue-700 font-medium rounded text-[10px]">Normal</span>`;
+                }
+
+                const wa = t.user_whatsapp || t.user_phone;
+                const updatedDate = new Date(t.updated_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+
+                return `
+                <tr class="hover:bg-gray-50/80 transition">
+                    <td class="py-3 px-4 text-xs font-mono font-bold text-gray-600">#${t.ticket_code}</td>
+                    <td class="py-3 px-4 text-xs">
+                        <div class="font-bold text-gray-800">${t.user_name}</div>
+                        <div class="text-[11px] text-gray-500">${t.user_email}</div>
+                        ${wa ? `<div class="text-[11px] text-emerald-600 flex items-center gap-1 mt-0.5"><i class="fab fa-whatsapp"></i> ${wa}</div>` : ''}
+                    </td>
+                    <td class="py-3 px-4 text-xs">
+                        <span class="px-2 py-0.5 bg-purple-50 text-purple-700 font-semibold rounded text-[10px] border border-purple-100">${t.category}</span>
+                        <div class="font-bold text-gray-800 mt-1 line-clamp-1">${t.subject}</div>
+                    </td>
+                    <td class="py-3 px-4 text-xs">${priorityBadge}</td>
+                    <td class="py-3 px-4 text-xs">${statusBadge}</td>
+                    <td class="py-3 px-4 text-xs text-gray-500">${updatedDate}</td>
+                    <td class="py-3 px-4 text-xs text-right whitespace-nowrap">
+                        <button onclick="openAdminReplyModal(${t.id})" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ml-auto shadow-xs">
+                            <i class="fas fa-comments"></i> Lihat & Balas
+                        </button>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+    } catch (err) {
+        console.error('Load admin tickets error:', err);
+    }
+}
+
+async function openAdminReplyModal(ticketId) {
+    document.getElementById('admDtTicketId').value = ticketId;
+    const modal = document.getElementById('adminReplyModal');
+    const thread = document.getElementById('admThreadMessagesContainer');
+
+    thread.innerHTML = '<div class="text-center py-8 text-gray-400 text-xs"><i class="fas fa-spinner fa-spin text-lg mb-1"></i> Memuat percakapan...</div>';
+    modal.classList.remove('hidden');
+
+    try {
+        const res = await fetch(`/api/admin/support/tickets/${ticketId}`);
+        const data = await res.json();
+
+        if (data.success) {
+            const t = data.ticket;
+            document.getElementById('admDtCode').textContent = t.ticket_code;
+            document.getElementById('admDtCategory').textContent = t.category;
+            document.getElementById('admDtSubject').textContent = t.subject;
+
+            const wa = t.user_whatsapp || '';
+            const waButton = wa ? `<a href="https://wa.me/${wa.replace(/[^0-9]/g, '')}" target="_blank" class="text-emerald-600 hover:text-emerald-700 font-bold underline flex items-center gap-1 ml-2"><i class="fab fa-whatsapp"></i> Chat WA User</a>` : '';
+            
+            document.getElementById('admDtUserInfo').innerHTML = `
+                <span>Pelapor: <strong>${t.user_name}</strong> (${t.user_email})</span>
+                ${waButton}
+            `;
+
+            let statusBadge = '';
+            if (t.status === 'open') {
+                statusBadge = `<span class="px-2 py-0.5 bg-amber-100 text-amber-800 rounded text-[11px] font-bold">Menunggu Balasan</span>`;
+            } else if (t.status === 'answered') {
+                statusBadge = `<span class="px-2 py-0.5 bg-blue-100 text-blue-800 rounded text-[11px] font-bold">Dibalas Admin</span>`;
+            } else {
+                statusBadge = `<span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded text-[11px] font-bold">Selesai</span>`;
+            }
+            document.getElementById('admDtStatusBadge').innerHTML = statusBadge;
+
+            // Render Messages
+            thread.innerHTML = data.messages.map(m => {
+                const isAdmin = m.sender_type === 'admin';
+                const timeStr = new Date(m.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+
+                return `
+                <div class="flex flex-col ${isAdmin ? 'items-end' : 'items-start'}">
+                    <div class="text-[10px] font-bold text-gray-400 mb-0.5 px-1">${m.sender_name || (isAdmin ? 'Admin' : 'User')} • ${timeStr}</div>
+                    <div class="max-w-[85%] rounded-2xl p-3 text-xs sm:text-sm ${isAdmin ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white text-gray-800 border border-gray-200 rounded-tl-none shadow-xs'}">
+                        <p class="whitespace-pre-line">${m.message}</p>
+                        ${m.attachment_url ? `
+                        <div class="mt-2 pt-2 border-t ${isAdmin ? 'border-indigo-500' : 'border-gray-100'}">
+                            <a href="${m.attachment_url}" target="_blank" class="block rounded-lg overflow-hidden border border-black/10">
+                                <img src="${m.attachment_url}" alt="Attachment" class="max-h-48 w-auto object-cover">
+                            </a>
+                        </div>` : ''}
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            thread.scrollTop = thread.scrollHeight;
+        }
+    } catch (err) {
+        console.error('Fetch admin ticket detail error:', err);
+    }
+}
+
+function closeAdminReplyModal() {
+    document.getElementById('adminReplyModal').classList.add('hidden');
+    document.getElementById('admReplyForm').reset();
+}
+
+document.getElementById('admReplyForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const ticketId = document.getElementById('admDtTicketId').value;
+    const message = document.getElementById('admReplyMessage').value.trim();
+    const fileInput = document.getElementById('admReplyAttachment');
+    const chkClose = document.getElementById('chkCloseTicket').checked;
+    const btn = document.getElementById('btnAdminSubmitReply');
+
+    if (!message) return;
+
+    btn.disabled = true;
+    const formData = new FormData();
+    formData.append('message', message);
+    formData.append('closeTicket', chkClose);
+    if (fileInput.files[0]) {
+        formData.append('attachment', fileInput.files[0]);
+    }
+
+    try {
+        const res = await fetch(`/api/admin/support/tickets/${ticketId}/reply`, {
+            method: 'POST',
+            body: formData
+        });
+
+        const data = await res.json();
+        btn.disabled = false;
+
+        if (data.success) {
+            if (typeof showToast === 'function') showToast(data.message, 'success');
+            document.getElementById('admReplyMessage').value = '';
+            fileInput.value = '';
+            closeAdminReplyModal();
+            loadAdminTickets();
+        } else {
+            if (typeof showToast === 'function') showToast(data.message, 'error');
+        }
+    } catch (err) {
+        btn.disabled = false;
+        if (typeof showToast === 'function') showToast('Gagal mengirim balasan admin', 'error');
+    }
+});
+</script>
+
+<%- include('partials/footer') %>

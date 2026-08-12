@@ -1,0 +1,227 @@
+<%- include('partials/header', { title: 'Realtime Webhook Monitor', page: 'webhook' }) %>
+
+<div class="mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div>
+        <h2 class="text-2xl lg:text-3xl font-bold text-gray-800 flex items-center gap-2">
+            <i class="fas fa-satellite-dish text-purple-600"></i> Webhook Monitor
+        </h2>
+        <p class="text-xs text-gray-500 mt-1">Pantau lalu lintas data webhook dari provider & supplier PPOB secara real-time.</p>
+    </div>
+    
+    <div class="flex items-center gap-3">
+        <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold shadow-sm animate-pulse">
+            <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Live Monitoring Active
+        </span>
+        <button onclick="fetchWebhooks(1)" class="px-3.5 py-1.5 bg-white hover:bg-gray-50 border border-gray-200 text-gray-700 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5">
+            <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+    </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 lg:p-6 mb-8">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider bg-gray-50/50">
+                    <th class="py-3 px-3">ID</th>
+                    <th class="py-3 px-3">Provider</th>
+                    <th class="py-3 px-3">Event Type</th>
+                    <th class="py-3 px-3">Status</th>
+                    <th class="py-3 px-3">IP Address</th>
+                    <th class="py-3 px-3">Waktu</th>
+                    <th class="py-3 px-3 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody id="webhookTableBody" class="divide-y divide-gray-100 font-sans">
+                <tr>
+                    <td colspan="7" class="py-8 text-center text-gray-400 text-sm">
+                        <i class="fas fa-spinner fa-spin mr-2"></i> Memuat data webhook...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-6 flex flex-col sm:flex-row items-center justify-between border-t border-gray-150 pt-4 gap-4">
+        <div class="text-xs text-gray-500 font-medium" id="paginationInfo">
+            Menampilkan data...
+        </div>
+        <div class="flex gap-1.5" id="paginationButtons">
+            <!-- Dynamic Pagination -->
+        </div>
+    </div>
+</div>
+
+<!-- Webhook Payload Detail Modal -->
+<div id="payloadModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-900 text-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-700 relative">
+        <div class="flex items-center justify-between pb-4 border-b border-slate-800 mb-4">
+            <h3 class="text-base font-bold text-emerald-400 flex items-center gap-2">
+                <i class="fas fa-code"></i> Detail Payload Webhook <span id="modalWebhookId" class="text-xs text-slate-400 font-mono">#0</span>
+            </h3>
+            <button onclick="closePayloadModal()" class="text-slate-400 hover:text-white transition">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+
+        <div class="space-y-3 mb-4 text-xs">
+            <div class="flex justify-between items-center bg-slate-800/80 p-3 rounded-xl border border-slate-700">
+                <span class="text-slate-400 font-medium">Provider: <strong id="modalProvider" class="text-white"></strong></span>
+                <span class="text-slate-400 font-medium">HTTP Code: <strong id="modalHttpCode" class="text-emerald-400 font-mono">200 OK</strong></span>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">RAW JSON Payload</label>
+            <pre id="modalJsonPayload" class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-emerald-300 overflow-x-auto max-h-80 select-all"></pre>
+        </div>
+
+        <div class="flex justify-end gap-2">
+            <button onclick="copyPayloadToClipboard()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition flex items-center gap-1.5">
+                <i class="fas fa-copy"></i> Copy JSON
+            </button>
+            <button onclick="closePayloadModal()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl text-xs transition">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+<script src="/js/toast.js?v=<%= Date.now() %>"></script>
+
+<script>
+let currentWebhooksData = [];
+let currentPage = 1;
+
+async function fetchWebhooks(page = 1) {
+    currentPage = page;
+    const tbody = document.getElementById('webhookTableBody');
+    try {
+        const response = await fetch(`/api/admin/webhooks?page=${page}&limit=15`);
+        const result = await response.json();
+
+        if (result.success) {
+            currentWebhooksData = result.webhooks;
+            renderTable(result.webhooks);
+            renderPagination(result.currentPage, result.totalPages, result.totalRecords);
+        } else {
+            tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-red-500 text-xs font-bold">${result.message}</td></tr>`;
+        }
+    } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-6 text-center text-red-500 text-xs font-bold">Gagal memuat data webhook</td></tr>`;
+    }
+}
+
+function renderTable(webhooks) {
+    const tbody = document.getElementById('webhookTableBody');
+    if (!webhooks || webhooks.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-gray-400 text-xs font-medium">Belum ada log data webhook yang masuk.</td></tr>`;
+        return;
+    }
+
+    tbody.innerHTML = webhooks.map(wh => {
+        const dateStr = new Date(wh.created_at).toLocaleString('id-ID');
+        const isSuccess = wh.http_code >= 200 && wh.http_code < 300;
+        const statusBadge = isSuccess 
+            ? `<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-extrabold border border-emerald-200"><i class="fas fa-check-circle mr-1"></i> ${wh.http_code || 200} OK</span>`
+            : `<span class="px-2.5 py-1 rounded-full bg-red-100 text-red-800 text-[11px] font-extrabold border border-red-200"><i class="fas fa-exclamation-circle mr-1"></i> ${wh.http_code || 500} ERR</span>`;
+
+        return `
+            <tr id="wh-row-${wh.id}" class="hover:bg-gray-50/80 transition">
+                <td class="py-3 px-3 text-xs font-mono font-bold text-gray-500">#${wh.id}</td>
+                <td class="py-3 px-3 text-xs font-bold text-gray-900">${escapeHtml(wh.provider || 'PPOB Supplier')}</td>
+                <td class="py-3 px-3 text-xs font-mono text-purple-700 bg-purple-50 px-2 py-0.5 rounded border border-purple-100 inline-block mt-2">${escapeHtml(wh.event_type || 'transaction_update')}</td>
+                <td class="py-3 px-3 text-xs">${statusBadge}</td>
+                <td class="py-3 px-3 text-xs font-mono text-gray-600">${escapeHtml(wh.ip_address || '127.0.0.1')}</td>
+                <td class="py-3 px-3 text-xs text-gray-500 whitespace-nowrap">${dateStr}</td>
+                <td class="py-3 px-3 text-xs text-right whitespace-nowrap">
+                    <button onclick="viewPayload(${wh.id})" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-bold text-[11px] transition shadow-sm">
+                        <i class="fas fa-eye mr-1"></i> Payload
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderPagination(page, totalPages, totalRecords) {
+    const info = document.getElementById('paginationInfo');
+    const container = document.getElementById('paginationButtons');
+
+    if (info) info.textContent = `Menampilkan halaman ${page} dari ${totalPages} (${totalRecords} total log)`;
+    if (!container) return;
+
+    let html = '';
+    if (page > 1) {
+        html += `<button onclick="fetchWebhooks(${page - 1})" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-bold transition">Prev</button>`;
+    }
+
+    const start = Math.max(1, page - 2);
+    const end = Math.min(totalPages, page + 2);
+
+    for (let i = start; i <= end; i++) {
+        const activeClass = i === page ? 'bg-purple-600 text-white font-bold' : 'bg-gray-100 hover:bg-gray-200 text-gray-700';
+        html += `<button onclick="fetchWebhooks(${i})" class="px-3 py-1.5 ${activeClass} rounded-lg text-xs transition">${i}</button>`;
+    }
+
+    if (page < totalPages) {
+        html += `<button onclick="fetchWebhooks(${page + 1})" class="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-xs font-bold transition">Next</button>`;
+    }
+
+    container.innerHTML = html;
+}
+
+let activePayloadText = '';
+
+function viewPayload(id) {
+    const wh = currentWebhooksData.find(item => item.id === id);
+    if (!wh) return;
+
+    document.getElementById('modalWebhookId').textContent = `#${wh.id}`;
+    document.getElementById('modalProvider').textContent = wh.provider || 'PPOB Supplier';
+    document.getElementById('modalHttpCode').textContent = `${wh.http_code || 200} OK`;
+    
+    activePayloadText = JSON.stringify(wh.payload || {}, null, 2);
+    document.getElementById('modalJsonPayload').textContent = activePayloadText;
+    document.getElementById('payloadModal').classList.remove('hidden');
+}
+
+function closePayloadModal() {
+    document.getElementById('payloadModal').classList.add('hidden');
+}
+
+function copyPayloadToClipboard() {
+    if (!activePayloadText) return;
+    navigator.clipboard.writeText(activePayloadText).then(() => {
+        showToast('JSON Payload berhasil di-copy!', 'success');
+    });
+}
+
+function escapeHtml(unsafe) {
+    return (unsafe || '').toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+// Real-time Socket.IO Listener for new incoming webhooks
+adminSocket.on('admin-new-webhook', (newWh) => {
+    showToast(`🔔 Webhook baru diterima dari ${newWh.provider || 'Supplier'}`, 'info');
+    if (currentPage === 1) {
+        currentWebhooksData.unshift(newWh);
+        renderTable(currentWebhooksData);
+        
+        // Highlight row
+        const row = document.getElementById(`wh-row-${newWh.id}`);
+        if (row) {
+            row.classList.add('bg-emerald-50');
+            setTimeout(() => row.classList.remove('bg-emerald-50'), 3000);
+        }
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    fetchWebhooks(1);
+});
+</script>
+
+<%- include('partials/footer') %>

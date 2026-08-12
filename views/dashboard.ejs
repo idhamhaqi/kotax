@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - KUOTAX</title>
+    <%- include('partials/pwa-head') %>
+    <link rel="stylesheet" href="/css/style.css?v=6">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glass-dark {
+            background: rgba(16, 185, 129, 0.1);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* ===== MOBILE APP STYLES (< 1024px) ===== */
+        @media (max-width: 1023px) {
+            body.mobile-dash {
+                background: #f8fafb;
+            }
+            /* Hero gradient header */
+            .m-hero {
+                background: linear-gradient(135deg, #059669 0%, #10b981 40%, #34d399 100%);
+                border-radius: 0 0 24px 24px;
+                padding: 16px 20px 24px;
+                margin: -16px -16px 0;
+                position: relative;
+                overflow: hidden;
+            }
+            .m-hero::before {
+                content: '';
+                position: absolute;
+                top: -40px;
+                right: -30px;
+                width: 160px;
+                height: 160px;
+                background: rgba(255,255,255,0.08);
+                border-radius: 50%;
+            }
+            .m-hero::after {
+                content: '';
+                position: absolute;
+                bottom: -20px;
+                left: -10px;
+                width: 100px;
+                height: 100px;
+                background: rgba(255,255,255,0.06);
+                border-radius: 50%;
+            }
+            /* Balance card inside hero */
+            .m-balance-card {
+                background: rgba(255,255,255,0.18);
+                backdrop-filter: blur(20px);
+                border: 1px solid rgba(255,255,255,0.2);
+                border-radius: 16px;
+                padding: 14px 16px;
+                margin-top: 14px;
+            }
+            /* Stats horizontal scroll */
+            .m-stats-scroll {
+                display: flex;
+                gap: 10px;
+                overflow-x: auto;
+                padding: 16px 4px 6px;
+                -ms-overflow-style: none;
+                scrollbar-width: none;
+            }
+            .m-stats-scroll::-webkit-scrollbar { display: none; }
+            .m-stat-pill {
+                flex: 0 0 auto;
+                background: #fff;
+                border-radius: 16px;
+                padding: 12px 14px;
+                min-width: 135px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+                border: 1px solid #f0f0f0;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+            .m-stat-pill .m-stat-icon {
+                width: 32px;
+                height: 32px;
+                border-radius: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 10px;
+                font-size: 13px;
+                flex-shrink: 0;
+            }
+            .m-stat-pill .m-stat-label {
+                font-size: 11px;
+                color: #6b7280;
+                margin-bottom: 3px;
+                font-weight: 600;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            .m-stat-pill .m-stat-value {
+                font-size: 14px;
+                font-weight: 800;
+                color: #111827;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                letter-spacing: -0.02em;
+            }
+            /* Section header */
+            .m-section-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 16px 0 12px;
+            }
+            .m-section-title {
+                font-size: 16px;
+                font-weight: 700;
+                color: #1f2937;
+            }
+            /* Order cards */
+            .m-order-card {
+                background: #fff;
+                border-radius: 14px;
+                padding: 14px 16px;
+                margin-bottom: 10px;
+                box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+                border: 1px solid #f3f4f6;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 min-h-screen mobile-dash">
+    <%- include('partials/sidebar', { page: 'dashboard' }) %>
+
+    <!-- ============================================ -->
+    <!-- MOBILE LAYOUT (visible only on < lg screens) -->
+    <!-- ============================================ -->
+    <div class="lg:hidden p-4 pb-24">
+        <!-- Hero Header -->
+        <div class="m-hero">
+            <!-- Top bar -->
+            <div class="flex items-center justify-between relative z-10">
+                <div>
+                    <p class="text-white/70 text-[11px] font-medium">Selamat datang <i class="fas fa-gem text-yellow-300 ml-0.5 text-[10px]"></i></p>
+                    <h1 id="userNameDisplay" class="text-white text-lg font-bold tracking-tight">Memuat...</h1>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                    <i class="fas fa-bell text-white text-sm"></i>
+                </div>
+            </div>
+
+            <!-- Balance Card -->
+            <div class="m-balance-card relative z-10">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-white/70 text-[10px] font-semibold uppercase tracking-wider mb-0.5">Saldo Utama</p>
+                        <p id="balance" class="text-xl font-bold text-white">Rp 0</p>
+                    </div>
+                    <div class="w-px h-8 bg-white/20"></div>
+                    <div class="text-right">
+                        <div class="flex items-center justify-end gap-1 mb-0.5">
+                            <span class="text-white/70 text-[10px] font-semibold uppercase tracking-wider">Saldo Tertahan</span>
+                            <button type="button" onclick="showHoldBalanceInfoModal()" class="text-white/80 hover:text-white text-[11px]" title="Apa itu Saldo Tertahan?">
+                                <i class="fas fa-question-circle"></i>
+                            </button>
+                        </div>
+                        <p id="holdBalanceMobile" class="text-xl font-bold text-white">Rp 0</p>
+                    </div>
+                </div>
+                <!-- Quick Actions -->
+                <div class="flex gap-2 mt-4 pt-3 border-t border-white/20">
+                    <a href="/deposit" class="flex-1 flex flex-col items-center gap-1 py-2 rounded-xl bg-white/15 hover:bg-white/25 transition">
+                        <i class="fas fa-plus-circle text-white text-base"></i>
+                        <span class="text-white text-[10px] font-semibold">Deposit</span>
+                    </a>
+                    <a href="/catalog" class="flex-1 flex flex-col items-center gap-1 py-2 rounded-xl bg-white/15 hover:bg-white/25 transition">
+                        <i class="fas fa-shopping-bag text-white text-base"></i>
+                        <span class="text-white text-[10px] font-semibold">Katalog</span>
+                    </a>
+                    <a href="/withdrawal" class="flex-1 flex flex-col items-center gap-1 py-2 rounded-xl bg-white/15 hover:bg-white/25 transition">
+                        <i class="fas fa-paper-plane text-white text-base"></i>
+                        <span class="text-white text-[10px] font-semibold">Tarik</span>
+                    </a>
+                    <a href="/referral" class="flex-1 flex flex-col items-center gap-1 py-2 rounded-xl bg-white/15 hover:bg-white/25 transition">
+                        <i class="fas fa-gift text-white text-base"></i>
+                        <span class="text-white text-[10px] font-semibold">Referral</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Horizontal Scroll -->
+        <div class="m-stats-scroll">
+            <div class="m-stat-pill">
+                <div class="m-stat-icon bg-amber-100 text-amber-600">
+                    <i class="fas fa-coins"></i>
+                </div>
+                <div class="m-stat-label">Keuntungan</div>
+                <div id="totalProfit" class="m-stat-value">Rp 0</div>
+            </div>
+            <div class="m-stat-pill">
+                <div class="m-stat-icon bg-emerald-100 text-emerald-600">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="m-stat-label">Referral</div>
+                <div id="referralCount" class="m-stat-value">0</div>
+            </div>
+            <div class="m-stat-pill">
+                <div class="m-stat-icon bg-blue-100 text-blue-600">
+                    <i class="fas fa-box"></i>
+                </div>
+                <div class="m-stat-label">Order Fill</div>
+                <div id="totalOrders" class="m-stat-value">0</div>
+            </div>
+            <div class="m-stat-pill">
+                <div class="m-stat-icon bg-purple-100 text-purple-600">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <div class="m-stat-label">Volume</div>
+                <div id="totalVolume" class="m-stat-value">Rp 0</div>
+            </div>
+        </div>
+
+        <!-- Pending Settlement Notice Strip (Mobile) -->
+        <div class="my-3 flex items-center gap-2.5 bg-amber-50 border border-amber-200 rounded-xl px-3.5 py-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.04)]">
+            <i class="fas fa-hourglass-half text-amber-600 text-xs"></i>
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-1">
+                        <span class="text-[11px] font-bold text-amber-900">Audit Settlement Vendor</span>
+                        <button type="button" onclick="showHoldBalanceInfoModal()" class="text-amber-700 hover:text-amber-900 text-[10px]">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                    </div>
+                    <span class="text-[10px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">Setiap Dini Hari</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Live Orders Section -->
+        <div class="m-section-header">
+            <span class="m-section-title">
+                <i class="fas fa-bolt text-amber-500 mr-1"></i> Live Orders B2B
+            </span>
+            <span id="orderCount" class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold">0 Active</span>
+        </div>
+
+        <div id="orderList" class="grid gap-3"></div>
+        <div id="noOrders" class="text-center py-10">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                <i class="fas fa-inbox text-gray-300 text-2xl"></i>
+            </div>
+            <p class="text-gray-400 text-sm">Menunggu order baru...</p>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- DESKTOP LAYOUT (visible only on >= lg screens) -->
+    <!-- ============================================ -->
+    <div class="hidden lg:block lg:ml-64 p-6 pb-8">
+        <!-- Header & Quick Welcome -->
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Dashboard</h1>
+                <p class="text-sm text-gray-600 font-medium mt-0.5">Selamat datang, <span id="userNameDisplayDesktop" class="font-bold text-emerald-600">User</span></p>
+            </div>
+            <div class="flex items-center gap-2">
+                <a href="/deposit" class="px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-bold hover:bg-emerald-700 transition shadow-sm flex items-center gap-1.5">
+                    <i class="fas fa-plus-circle"></i> Deposit
+                </a>
+                <a href="/catalog" class="px-4 py-2 rounded-xl bg-slate-800 text-white text-sm font-bold hover:bg-slate-900 transition shadow-sm flex items-center gap-1.5">
+                    <i class="fas fa-store"></i> Katalog
+                </a>
+            </div>
+        </div>
+
+        <!-- Compact 5-Column Stats Bar (Light Theme & Clear Text) -->
+        <div class="grid grid-cols-5 gap-3 mb-3">
+            <!-- Saldo Utama -->
+            <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0">
+                    <i class="fas fa-wallet text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-xs text-gray-500 font-semibold mb-0.5">Saldo Utama</p>
+                    <p id="balanceDesktop" class="text-lg font-bold text-gray-900 font-mono truncate">Rp 0</p>
+                </div>
+            </div>
+
+            <!-- Saldo Tertahan -->
+            <div class="bg-white rounded-xl p-4 border border-amber-200 shadow-sm flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                    <i class="fas fa-hourglass-half text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <div class="flex items-center gap-1 mb-0.5">
+                        <p class="text-xs text-gray-500 font-semibold">Saldo Tertahan</p>
+                        <button type="button" onclick="showHoldBalanceInfoModal()" class="text-amber-600 hover:text-amber-700 text-xs" title="Informasi Saldo Tertahan">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                    </div>
+                    <p id="holdBalanceDesktop" class="text-lg font-bold text-amber-700 font-mono truncate">Rp 0</p>
+                </div>
+            </div>
+
+            <!-- Net Profit -->
+            <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+                    <i class="fas fa-coins text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-xs text-gray-500 font-semibold mb-0.5">Keuntungan (Net)</p>
+                    <p id="totalProfitDesktop" class="text-lg font-bold text-emerald-600 font-mono truncate">Rp 0</p>
+                </div>
+            </div>
+
+            <!-- Volume -->
+            <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+                    <i class="fas fa-chart-line text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-xs text-gray-500 font-semibold mb-0.5">Volume Transaksi</p>
+                    <p id="totalVolumeDesktop" class="text-lg font-bold text-gray-900 font-mono truncate">Rp 0</p>
+                </div>
+            </div>
+
+            <!-- Total Orders -->
+            <div class="bg-white rounded-xl p-4 border border-gray-100 shadow-sm flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
+                    <i class="fas fa-box text-lg"></i>
+                </div>
+                <div class="min-w-0">
+                    <p class="text-xs text-gray-500 font-semibold mb-0.5">Order Diproses</p>
+                    <p id="totalOrdersDesktop" class="text-lg font-bold text-gray-900 font-mono truncate">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Settlement Audit Banner (Desktop) -->
+        <div class="bg-amber-50/80 rounded-xl py-3 px-4 border border-amber-200 shadow-sm mb-4 flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2.5">
+                <i class="fas fa-hourglass-half text-amber-600 text-base"></i>
+                <div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="text-xs font-extrabold text-amber-950">Audit & Settlement Transaksi Mitra Vendor</span>
+                        <button type="button" onclick="showHoldBalanceInfoModal()" class="text-amber-700 hover:text-amber-900 text-xs">
+                            <i class="fas fa-question-circle"></i>
+                        </button>
+                    </div>
+                    <p class="text-[11px] text-amber-800">Modal & profit transaksi hari ini ditampung sementara di <strong>Saldo Tertahan</strong> dan akan ditransfer otomatis ke Saldo Utama Anda setiap dini hari.</p>
+                </div>
+            </div>
+            <span class="text-xs font-bold text-amber-900 bg-amber-100 px-3 py-1 rounded-full border border-amber-200 shrink-0">
+                <i class="fas fa-shield-alt text-amber-600 mr-1"></i> Audit Dini Hari
+            </span>
+        </div>
+
+        <!-- Live Orders - Desktop -->
+        <div class="glass rounded-2xl p-6 shadow-lg">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-lg font-bold text-gray-800">
+                    <i class="fas fa-bolt text-green-600"></i> Live Orders B2B
+                </h3>
+                <span id="orderCountDesktop" class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-semibold">0 Active</span>
+            </div>
+            <div id="orderListDesktop" class="grid gap-4"></div>
+            <div id="noOrdersDesktop" class="text-center py-12">
+                <i class="fas fa-inbox text-gray-300 text-6xl mb-4"></i>
+                <p class="text-gray-500">Menunggu order baru...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Persistent Order Processing Modal (Unclosable) -->
+    <div id="orderProcessingModal" class="hidden fixed inset-0 z-50 bg-slate-900/85 backdrop-blur-md flex items-center justify-center p-4 selection:bg-emerald-500 selection:text-white">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative overflow-hidden text-center transform transition-all">
+            <!-- Ambient Glow -->
+            <div id="modalAmbientGlow" class="absolute -top-24 -left-24 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none transition-colors duration-500"></div>
+
+            <!-- Header Provider Badge & Package Title -->
+            <div class="mb-4">
+                <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700 mb-2">
+                    <span id="procProviderBadge" class="uppercase text-emerald-600 font-extrabold">Provider</span> • <span id="procSourceText">Mitra B2B</span>
+                </div>
+                <h3 id="procPackageTitle" class="text-lg font-black text-slate-900 leading-tight">Paket Data Telkomsel</h3>
+                <p id="procPhoneText" class="text-xs font-mono text-slate-500">0812-3456-7890</p>
+            </div>
+
+            <!-- Step Visual Animation Box -->
+            <div class="my-5 p-5 rounded-2xl bg-slate-50 border border-slate-200 text-center relative overflow-hidden min-h-[140px] flex flex-col justify-center items-center">
+                
+                <!-- Status Icon Circle -->
+                <div id="procIconContainer" class="w-16 h-16 rounded-2xl bg-red-100 text-red-600 border border-red-200 flex items-center justify-center text-2xl font-bold mb-3 transition-all duration-500 shadow-md">
+                    <i id="procStatusIcon" class="fas fa-lock animate-bounce"></i>
+                </div>
+
+                <!-- Status Step Label -->
+                <h4 id="procStepTitle" class="text-sm font-extrabold text-slate-800 mb-1">Step 1: Modal Order</h4>
+                <p id="procStepSubtitle" class="text-xs font-semibold text-slate-500">Modal sebesar <span id="procBasePriceText" class="text-red-600 font-bold font-mono">Rp 0</span> digunakan untuk memproses order</p>
+
+                <!-- Amount Badge Highlight -->
+                <div id="procAmountHighlight" class="mt-3 px-4 py-1.5 rounded-full bg-red-50 text-red-600 border border-red-200 font-black text-sm font-mono tracking-tight shadow-sm transition-all duration-500">
+                    -Rp 0
+                </div>
+            </div>
+
+            <!-- Multi-step Indicator Bar -->
+            <div class="grid grid-cols-3 gap-2 text-center pt-2">
+                <div id="stepDot1" class="py-2 px-1 rounded-xl bg-red-50 border border-red-200 transition-all">
+                    <span class="block text-[10px] font-bold text-red-600 uppercase">1. Modal Order</span>
+                    <i class="fas fa-check-circle text-xs text-red-500 mt-0.5"></i>
+                </div>
+                <div id="stepDot2" class="py-2 px-1 rounded-xl bg-slate-100 border border-slate-200 opacity-50 transition-all">
+                    <span class="block text-[10px] font-bold text-slate-500 uppercase">2. Eksekusi</span>
+                    <i class="fas fa-spinner fa-spin text-xs text-slate-400 mt-0.5"></i>
+                </div>
+                <div id="stepDot3" class="py-2 px-1 rounded-xl bg-slate-100 border border-slate-200 opacity-50 transition-all">
+                    <span class="block text-[10px] font-bold text-slate-500 uppercase">3. Modal + Profit</span>
+                    <i class="fas fa-coins text-xs text-slate-400 mt-0.5"></i>
+                </div>
+            </div>
+
+            <!-- Bottom Alert -->
+            <p class="mt-4 text-[11px] text-slate-400 font-medium">
+                <i class="fas fa-shield-alt text-emerald-500"></i> Mohon tunggu hingga proses eksekusi selesai otomatis.
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal Informasi Saldo Tertahan -->
+    <div id="holdBalanceInfoModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-gray-100 relative">
+            <button type="button" onclick="closeHoldBalanceInfoModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-sm font-bold">
+                <i class="fas fa-times"></i>
+            </button>
+            <div class="w-12 h-12 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center text-xl mb-4 font-bold">
+                <i class="fas fa-hourglass-half"></i>
+            </div>
+            <h3 class="text-lg font-extrabold text-gray-900 mb-2">Apa itu Saldo Tertahan?</h3>
+            <div class="space-y-3 text-xs sm:text-sm text-gray-600 leading-relaxed">
+                <p>
+                    <strong>Saldo Tertahan (Pending Settlement)</strong> adalah akumulasi modal dan keuntungan dari transaksi order yang baru saja Anda selesaikan hari ini.
+                </p>
+                <div class="bg-amber-50 border border-amber-200 rounded-xl p-3.5 text-amber-900 text-xs">
+                    <i class="fas fa-shield-alt text-amber-600 mr-1"></i>
+                    Dana sedang dalam proses audit transaksi & kliring oleh tim keuangan mitra vendor PPOB.
+                </div>
+                <p>
+                    Setelah proses audit selesai setiap malam (dini hari), saldo ini akan <strong>otomatis ditransfer 100% ke Saldo Utama Anda</strong> sehingga dapat digunakan kembali untuk memproses order atau ditarik (withdraw).
+                </p>
+            </div>
+            <button type="button" onclick="closeHoldBalanceInfoModal()" class="mt-5 w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition shadow-md">
+                Saya Mengerti
+            </button>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+    <script src="/js/toast.js?v=<%= Date.now() %>"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+    function showHoldBalanceInfoModal() {
+        const m = document.getElementById('holdBalanceInfoModal');
+        if (m) m.classList.remove('hidden');
+    }
+    function closeHoldBalanceInfoModal() {
+        const m = document.getElementById('holdBalanceInfoModal');
+        if (m) m.classList.add('hidden');
+    }
+    </script>
+    <script src="/js/dashboard.js?v=<%= Date.now() %>"></script>
+    <%- include('partials/pwa-script') %>
+</body>
+</html>

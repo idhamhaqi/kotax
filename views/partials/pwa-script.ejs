@@ -1,0 +1,25 @@
+<script>
+/**
+ * PWA Kill-Switch
+ * Secara paksa menghapus Service Worker dan Caches agar tidak mengganggu realtime (Socket.IO).
+ */
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', async function() {
+        try {
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (let registration of registrations) {
+                await registration.unregister();
+                console.log('✅ PWA: Service Worker unregistered successfully.');
+            }
+            
+            const cacheNames = await caches.keys();
+            await Promise.all(cacheNames.map(name => caches.delete(name)));
+            if (cacheNames.length > 0) {
+                console.log('🧹 PWA: Caches cleared successfully.');
+            }
+        } catch (err) {
+            console.error('❌ PWA: Cleanup error', err);
+        }
+    });
+}
+</script>

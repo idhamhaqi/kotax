@@ -1,0 +1,78 @@
+<!-- Desktop Sidebar -->
+<div class="fixed top-0 left-0 h-full w-64 glass shadow-2xl z-40 hidden lg:block">
+    <div class="p-6">
+        <div class="mb-8 text-center">
+            <img src="/images/logoa.png" alt="Kuota Aggregator" class="h-14 w-auto mx-auto">
+        </div>
+
+        <nav class="space-y-2">
+            <a href="/dashboard" class="<%= page === 'dashboard' ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white' : 'text-gray-700 hover:bg-gray-100' %> flex items-center gap-3 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-home w-5"></i>
+                <span class="font-semibold">Dashboard</span>
+            </a>
+            <a href="/catalog" class="<%= page === 'catalog' ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white' : 'text-gray-700 hover:bg-gray-100' %> flex items-center gap-3 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-store w-5"></i>
+                <span class="font-semibold">Katalog PPOB</span>
+            </a>
+            <a href="/history" class="<%= page === 'history' ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white' : 'text-gray-700 hover:bg-gray-100' %> flex items-center gap-3 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-history w-5"></i>
+                <span class="font-semibold">Riwayat</span>
+            </a>
+            <a href="/profile" class="<%= page === 'profile' ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white' : 'text-gray-700 hover:bg-gray-100' %> flex items-center gap-3 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-user w-5"></i>
+                <span class="font-semibold">Profil</span>
+            </a>
+            <a href="/support" class="<%= page === 'support' ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white' : 'text-gray-700 hover:bg-gray-100' %> flex items-center gap-3 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-headset w-5"></i>
+                <span class="font-semibold">Tiket Bantuan</span>
+            </a>
+            <a href="/more" class="<%= page === 'more' ? 'bg-gradient-to-r from-emerald-600 to-green-600 text-white' : 'text-gray-700 hover:bg-gray-100' %> flex items-center gap-3 px-4 py-3 rounded-lg transition">
+                <i class="fas fa-ellipsis-h w-5"></i>
+                <span class="font-semibold">Lainnya</span>
+            </a>
+        </nav>
+
+        <div class="mt-8 pt-8 border-t border-gray-200">
+            <a href="/api/auth/logout" class="flex items-center gap-3 px-4 py-3 rounded-lg text-red-600 hover:bg-red-50 transition">
+                <i class="fas fa-sign-out-alt w-5"></i>
+                <span class="font-semibold">Logout</span>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Bottom Navigation -->
+<nav class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 z-50" style="box-shadow: 0 -4px 20px rgba(0,0,0,0.03); padding-bottom: env(safe-area-inset-bottom);">
+    <div class="grid grid-cols-5 h-16 max-w-md mx-auto">
+        <a href="/dashboard" class="flex flex-col items-center justify-center transition-all <%= page === 'dashboard' ? 'text-emerald-600' : 'text-gray-400 hover:text-gray-600' %>">
+            <div class="flex flex-col items-center justify-center w-12 h-10 rounded-xl <%= page === 'dashboard' ? 'bg-emerald-50' : '' %>">
+                <i class="fas fa-home text-lg mb-0.5"></i>
+                <span class="text-[10px] font-semibold tracking-tight leading-none">Home</span>
+            </div>
+        </a>
+        <a href="/catalog" class="flex flex-col items-center justify-center transition-all <%= page === 'catalog' ? 'text-emerald-600' : 'text-gray-400 hover:text-gray-600' %>">
+            <div class="flex flex-col items-center justify-center w-12 h-10 rounded-xl <%= page === 'catalog' ? 'bg-emerald-50' : '' %>">
+                <i class="fas fa-store text-lg mb-0.5"></i>
+                <span class="text-[10px] font-semibold tracking-tight leading-none">Katalog</span>
+            </div>
+        </a>
+        <a href="/history" class="flex flex-col items-center justify-center transition-all <%= page === 'history' ? 'text-emerald-600' : 'text-gray-400 hover:text-gray-600' %>">
+            <div class="flex flex-col items-center justify-center w-12 h-10 rounded-xl <%= page === 'history' ? 'bg-emerald-50' : '' %>">
+                <i class="fas fa-clock-rotate-left text-lg mb-0.5"></i>
+                <span class="text-[10px] font-semibold tracking-tight leading-none">Riwayat</span>
+            </div>
+        </a>
+        <a href="/profile" class="flex flex-col items-center justify-center transition-all <%= page === 'profile' ? 'text-emerald-600' : 'text-gray-400 hover:text-gray-600' %>">
+            <div class="flex flex-col items-center justify-center w-12 h-10 rounded-xl <%= page === 'profile' ? 'bg-emerald-50' : '' %>">
+                <i class="fas fa-user text-lg mb-0.5"></i>
+                <span class="text-[10px] font-semibold tracking-tight leading-none">Profil</span>
+            </div>
+        </a>
+        <a href="/more" class="flex flex-col items-center justify-center transition-all <%= page === 'more' ? 'text-emerald-600' : 'text-gray-400 hover:text-gray-600' %>">
+            <div class="flex flex-col items-center justify-center w-12 h-10 rounded-xl <%= page === 'more' ? 'bg-emerald-50' : '' %>">
+                <i class="fas fa-grip text-lg mb-0.5"></i>
+                <span class="text-[10px] font-semibold tracking-tight leading-none">Lainnya</span>
+            </div>
+        </a>
+    </div>
+</nav>

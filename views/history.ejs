@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Riwayat Transaksi & Order - KUOTAX</title>
+    <%- include('partials/pwa-head') %>
+    <link rel="stylesheet" href="/css/style.css?v=6">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .tab-active {
+            background-color: #10b981;
+            color: #ffffff;
+            font-weight: 800;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+        }
+        .tab-inactive {
+            background-color: #ffffff;
+            color: #4b5563;
+            font-weight: 600;
+        }
+        .tab-inactive:hover {
+            background-color: #f3f4f6;
+            color: #111827;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 min-h-screen selection:bg-emerald-500 selection:text-white">
+    <%- include('partials/sidebar', { page: 'history' }) %>
+
+    <!-- ============================================ -->
+    <!-- MOBILE LAYOUT (visible only on < lg screens) -->
+    <!-- ============================================ -->
+    <div class="lg:hidden bg-[#f8fafb] min-h-screen pb-24">
+        <!-- App Bar -->
+        <div class="bg-white border-b border-gray-100 px-4 py-3.5 sticky top-0 z-20 flex items-center justify-between shadow-sm">
+            <h1 class="text-lg font-bold text-gray-800 tracking-tight">Riwayat</h1>
+            <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i class="fas fa-history text-sm"></i>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <!-- Mobile Tab Bar Switcher -->
+            <div class="grid grid-cols-2 gap-2 mb-4 bg-gray-100 p-1.5 rounded-2xl border border-gray-200">
+                <button id="mobileTabOrders" onclick="switchTab('orders')" class="py-2.5 px-3 rounded-xl text-xs text-center transition-all tab-active flex items-center justify-center gap-1.5">
+                    <i class="fas fa-box text-xs"></i> Order Selesai
+                </button>
+                <button id="mobileTabMutasi" onclick="switchTab('mutasi')" class="py-2.5 px-3 rounded-xl text-xs text-center transition-all tab-inactive flex items-center justify-center gap-1.5">
+                    <i class="fas fa-wallet text-xs"></i> Mutasi Saldo
+                </button>
+            </div>
+
+            <!-- Tab 1: Orders Mobile List -->
+            <div id="viewOrdersMobile">
+                <div id="historyListMobile" class="space-y-3"></div>
+                <div id="emptyStateMobile" class="hidden bg-white rounded-2xl p-8 text-center border border-gray-100 mt-2">
+                    <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-inbox text-gray-300 text-xl"></i>
+                    </div>
+                    <p class="text-gray-400 text-xs font-medium">Belum ada riwayat fill order</p>
+                </div>
+            </div>
+
+            <!-- Tab 2: Mutasi Saldo Mobile List -->
+            <div id="viewMutasiMobile" class="hidden">
+                <div id="mutasiListMobile" class="space-y-3"></div>
+                <div id="emptyMutasiMobile" class="hidden bg-white rounded-2xl p-8 text-center border border-gray-100 mt-2">
+                    <div class="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fas fa-receipt text-gray-300 text-xl"></i>
+                    </div>
+                    <p class="text-gray-400 text-xs font-medium">Belum ada mutasi saldo</p>
+                </div>
+            </div>
+            
+            <div id="loadMoreContainerMobile" class="hidden mt-4 text-center">
+                <button id="loadMoreBtnMobile" class="px-6 py-2.5 rounded-full bg-white border border-gray-200 text-gray-700 text-xs font-bold shadow-sm hover:bg-gray-50">
+                    Muat Lebih Banyak
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- DESKTOP LAYOUT (visible only on >= lg screens) -->
+    <!-- ============================================ -->
+    <div class="hidden lg:block lg:ml-64 p-8 pb-8">
+        <div class="mb-6 flex items-center justify-between">
+            <div>
+                <h1 class="text-2xl lg:text-3xl font-extrabold text-gray-900 tracking-tight">Riwayat Aktivitas</h1>
+                <p class="text-gray-600 text-sm">Pantau orderan yang telah diselesaikan dan mutasi arus kas saldo Anda.</p>
+            </div>
+
+            <!-- Desktop Tab Bar Switcher -->
+            <div class="inline-flex p-1 bg-white border border-gray-200 rounded-2xl shadow-sm">
+                <button id="desktopTabOrders" onclick="switchTab('orders')" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all tab-active flex items-center gap-2">
+                    <i class="fas fa-box"></i> Order Selesai
+                </button>
+                <button id="desktopTabMutasi" onclick="switchTab('mutasi')" class="px-5 py-2.5 rounded-xl text-xs font-bold transition-all tab-inactive flex items-center gap-2">
+                    <i class="fas fa-receipt"></i> Mutasi Saldo (Debit/Kredit)
+                </button>
+            </div>
+        </div>
+
+        <!-- Tab 1: Orders Desktop Table -->
+        <div id="viewOrdersDesktop" class="glass rounded-3xl p-6 shadow-xl border border-white">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            <th class="text-left py-3.5 px-3">Waktu</th>
+                            <th class="text-left py-3.5 px-3">Sumber</th>
+                            <th class="text-left py-3.5 px-3">Provider</th>
+                            <th class="text-left py-3.5 px-3">Nomor Tujuan</th>
+                            <th class="text-left py-3.5 px-3">Kuota</th>
+                            <th class="text-left py-3.5 px-3">Harga Jual</th>
+                            <th class="text-left py-3.5 px-3">Profit Bersih</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyTableDesktop"></tbody>
+                </table>
+            </div>
+
+            <div id="emptyStateDesktop" class="hidden text-center py-14">
+                <i class="fas fa-inbox text-gray-300 text-6xl mb-3"></i>
+                <p class="text-gray-500 font-medium">Belum ada riwayat fill order</p>
+            </div>
+
+            <div id="paginationContainerDesktop" class="hidden mt-6 flex items-center justify-between border-t border-gray-200 pt-4">
+                <div class="text-xs text-gray-600 font-medium" id="paginationInfoDesktop"></div>
+                <div class="flex gap-1" id="paginationPagesDesktop"></div>
+            </div>
+        </div>
+
+        <!-- Tab 2: Mutasi Saldo Desktop Table -->
+        <div id="viewMutasiDesktop" class="hidden glass rounded-3xl p-6 shadow-xl border border-white">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                            <th class="text-left py-3.5 px-3">Waktu</th>
+                            <th class="text-left py-3.5 px-3">Tipe</th>
+                            <th class="text-left py-3.5 px-3">Keterangan Mutasi</th>
+                            <th class="text-right py-3.5 px-3">Nominal (Rp)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="mutasiTableDesktop"></tbody>
+                </table>
+            </div>
+
+            <div id="emptyMutasiDesktop" class="hidden text-center py-14">
+                <i class="fas fa-receipt text-gray-300 text-6xl mb-3"></i>
+                <p class="text-gray-500 font-medium">Belum ada riwayat mutasi saldo</p>
+            </div>
+
+            <div id="paginationMutasiContainerDesktop" class="hidden mt-6 flex items-center justify-between border-t border-gray-200 pt-4">
+                <div class="text-xs text-gray-600 font-medium" id="paginationMutasiInfoDesktop"></div>
+                <div class="flex gap-1" id="paginationMutasiPagesDesktop"></div>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+    <script src="/js/toast.js?v=<%= Date.now() %>"></script>
+    <script src="/js/history.js?v=<%= Date.now() %>"></script>
+    <%- include('partials/pwa-script') %>
+</body>
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Kuotax | Marketplace Kuota Internet Indonesia</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Kuotax adalah platform marketplace kuota internet yang menghubungkan lebih dari 1.000 mitra UMKM seperti konter pulsa dan server pulsa di seluruh Indonesia.">
+    <meta name="keywords" content="kuotax, kuota internet, marketplace kuota, reseller kuota, jual kuota, konter pulsa online, UMKM Indonesia">
+    <meta name="author" content="Kuotax">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Login - Kuotax | Marketplace Kuota Internet Indonesia">
+    <meta property="og:description" content="Platform marketplace kuota internet yang menghubungkan lebih dari 1.000 mitra UMKM di seluruh Indonesia.">
+    <meta property="og:image" content="/ogimage.webp">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/icon.png">
+    <link rel="shortcut icon" href="/images/icon.png">
+
+    <link rel="stylesheet" href="/css/style.css?v=7">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        /* Mobile app styles */
+        @media (max-width: 1023px) {
+            body.login-page { background: #f8fafb; margin: 0; }
+            .m-login-hero {
+                background: linear-gradient(135deg, #059669 0%, #10b981 40%, #34d399 100%);
+                padding: 48px 24px 56px;
+                text-align: center;
+                position: relative;
+                overflow: hidden;
+            }
+            .m-login-hero::before {
+                content: '';
+                position: absolute;
+                top: -60px; right: -40px;
+                width: 200px; height: 200px;
+                background: rgba(255,255,255,0.07);
+                border-radius: 50%;
+            }
+            .m-login-hero::after {
+                content: '';
+                position: absolute;
+                bottom: -30px; left: -20px;
+                width: 140px; height: 140px;
+                background: rgba(255,255,255,0.05);
+                border-radius: 50%;
+            }
+            .m-login-form-wrapper {
+                margin-top: -28px;
+                padding: 0 16px 32px;
+                position: relative;
+                z-index: 10;
+            }
+            .m-login-card {
+                background: #fff;
+                border-radius: 20px;
+                padding: 28px 20px;
+                box-shadow: 0 4px 24px rgba(0,0,0,0.06);
+                border: 1px solid #f0f0f0;
+            }
+        }
+        /* Desktop split layout */
+        @media (min-width: 1024px) {
+            .d-login-split {
+                display: flex;
+                min-height: 100vh;
+            }
+            .d-login-branding {
+                flex: 1;
+                background: linear-gradient(135deg, #059669 0%, #10b981 40%, #34d399 100%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 48px;
+                position: relative;
+                overflow: hidden;
+            }
+            .d-login-branding::before {
+                content: '';
+                position: absolute;
+                top: -100px; right: -60px;
+                width: 300px; height: 300px;
+                background: rgba(255,255,255,0.06);
+                border-radius: 50%;
+            }
+            .d-login-branding::after {
+                content: '';
+                position: absolute;
+                bottom: -50px; left: -30px;
+                width: 200px; height: 200px;
+                background: rgba(255,255,255,0.04);
+                border-radius: 50%;
+            }
+            .d-login-form-side {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 48px;
+                background: #f8fafb;
+            }
+        }
+        .login-input {
+            width: 100%;
+            padding: 14px 42px;
+            border-radius: 12px;
+            border: 1.5px solid #e5e7eb;
+            background: #f9fafb;
+            font-size: 15px;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .login-input:focus {
+            border-color: #10b981;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            background: #059669;
+            color: #fff;
+            font-weight: 700;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .login-btn:hover {
+            background: #047857;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(5,150,105,0.3);
+        }
+        .login-btn:active {
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="login-page">
+
+    <!-- ============================================ -->
+    <!-- MOBILE LAYOUT (< lg screens) -->
+    <!-- ============================================ -->
+    <div class="lg:hidden">
+        <!-- Hero Header -->
+        <div class="m-login-hero">
+            <div class="relative z-10">
+                <img src="/images/logoa.png" alt="Kuotax" class="h-24 w-auto mx-auto mb-4">
+                <h1 class="text-white text-xl font-bold mb-1">Selamat Datang</h1>
+                <p class="text-white/70 text-sm">Masuk ke akun Anda untuk mulai</p>
+            </div>
+        </div>
+
+        <!-- Login Form -->
+        <div class="m-login-form-wrapper">
+            <div class="m-login-card">
+                <form id="loginFormMobile" class="space-y-5">
+                    <div>
+                        <label class="block text-gray-700 text-xs font-bold mb-2 uppercase tracking-wide">Email</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                            <input type="email" name="email" required
+                                class="login-input"
+                                placeholder="nama@email.com">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-gray-700 text-xs font-bold uppercase tracking-wide">Password</label>
+                            <a href="/forgot-password" class="text-xs font-bold text-emerald-600 hover:text-emerald-700">Lupa Password?</a>
+                        </div>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                            <input type="password" name="password" required
+                                class="login-input"
+                                placeholder="Masukkan password">
+                            <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 toggle-password" onclick="togglePasswordVisibility(this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Masuk
+                    </button>
+                </form>
+
+                <div class="mt-6 pt-5 border-t border-gray-100 text-center">
+                    <p class="text-gray-500 text-sm">
+                        Belum punya akun?
+                        <a href="/register" class="text-emerald-600 font-bold hover:text-emerald-700">Daftar Sekarang</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- DESKTOP LAYOUT (>= lg screens) -->
+    <!-- ============================================ -->
+    <div class="hidden lg:flex d-login-split">
+        <!-- Left: Branding -->
+        <div class="d-login-branding">
+            <div class="relative z-10 text-center">
+                <img src="/images/logoa.png" alt="Kuotax" class="h-32 w-auto mx-auto mb-6">
+                <h1 class="text-white text-3xl font-bold mb-3">Kuotax</h1>
+                <p class="text-white/80 text-lg max-w-md mx-auto leading-relaxed">
+                    Platform marketplace kuota internet yang menghubungkan ribuan mitra UMKM di seluruh Indonesia
+                </p>
+                <div class="flex items-center justify-center gap-6 mt-10">
+                    <div class="text-center">
+                        <p class="text-white text-2xl font-bold">1.000+</p>
+                        <p class="text-white/60 text-xs font-medium">Mitra Aktif</p>
+                    </div>
+                    <div class="w-px h-10 bg-white/20"></div>
+                    <div class="text-center">
+                        <p class="text-white text-2xl font-bold">38</p>
+                        <p class="text-white/60 text-xs font-medium">Provinsi</p>
+                    </div>
+                    <div class="w-px h-10 bg-white/20"></div>
+                    <div class="text-center">
+                        <p class="text-white text-2xl font-bold">24/7</p>
+                        <p class="text-white/60 text-xs font-medium">Auto Fill</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Form -->
+        <div class="d-login-form-side">
+            <div class="w-full max-w-md">
+                <div class="mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">Masuk</h2>
+                    <p class="text-gray-500">Masuk ke akun Anda untuk melanjutkan</p>
+                </div>
+
+                <form id="loginFormDesktop" class="space-y-5">
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
+                        <div class="relative">
+                            <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                            <input type="email" name="email" required
+                                class="login-input"
+                                placeholder="nama@email.com">
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-gray-700 text-sm font-bold">Password</label>
+                            <a href="/forgot-password" class="text-xs font-bold text-emerald-600 hover:text-emerald-700">Lupa Password?</a>
+                        </div>
+                        <div class="relative">
+                            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                            <input type="password" name="password" required
+                                class="login-input"
+                                placeholder="Masukkan password">
+                            <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 toggle-password" onclick="togglePasswordVisibility(this)">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i> Masuk
+                    </button>
+                </form>
+
+                <p class="text-center text-gray-500 mt-6 text-sm">
+                    Belum punya akun?
+                    <a href="/register" class="text-emerald-600 font-bold hover:text-emerald-700">Daftar Sekarang</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+    <script src="/js/toast.js?v=<%= Date.now() %>"></script>
+    <script>
+    function togglePasswordVisibility(btn) {
+        const input = btn.previousElementSibling;
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const forms = ['loginFormMobile', 'loginFormDesktop'];
+        forms.forEach(formId => {
+            const form = document.getElementById(formId);
+            if (form) {
+                form.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(form);
+                    const data = Object.fromEntries(formData);
+                    const btn = form.querySelector('button[type="submit"]');
+                    const origText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memproses...';
+                    btn.disabled = true;
+
+                    try {
+                        const response = await fetch('/api/auth/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(data)
+                        });
+                        const result = await response.json();
+
+                        if (result.success) {
+                            showToast(result.message, 'success');
+                            setTimeout(() => { window.location.href = result.redirect; }, 500);
+                        } else {
+                            showToast(result.message, 'error');
+                            if (result.redirect) {
+                                setTimeout(() => { window.location.href = result.redirect; }, 2000);
+                            }
+                            btn.innerHTML = origText;
+                            btn.disabled = false;
+                        }
+                    } catch (error) {
+                        showToast('Terjadi kesalahan jaringan', 'error');
+                        btn.innerHTML = origText;
+                        btn.disabled = false;
+                    }
+                });
+            }
+        });
+    });
+    </script>
+</body>
+</html>

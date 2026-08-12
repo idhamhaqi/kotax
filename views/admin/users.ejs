@@ -1,0 +1,357 @@
+<%- include('partials/header', { title: 'Users Management', page: 'users' }) %>
+
+<div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+    <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Users Management</h2>
+    <span class="text-xs sm:text-sm bg-purple-50 text-purple-700 px-3 py-1.5 rounded-lg border border-purple-200 font-medium self-start sm:self-auto">
+        <i class="fas fa-users mr-1"></i> Total Users: <%= totalRecords %>
+    </span>
+</div>
+
+<div class="bg-white rounded-xl shadow-lg p-4 lg:p-6">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="border-b border-gray-200 text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    <th class="py-3 px-3">ID</th>
+                    <th class="py-3 px-3">Name</th>
+                    <th class="py-3 px-3">Email & WA</th>
+                    <th class="py-3 px-3">Type</th>
+                    <th class="py-3 px-3">Balance</th>
+                    <th class="py-3 px-3">Bank Account</th>
+                    <th class="py-3 px-3">Referral</th>
+                    <th class="py-3 px-3">Registered</th>
+                    <th class="py-3 px-3">PIN Status</th>
+                    <th class="py-3 px-3 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                <% users.forEach(user => { %>
+                <tr class="hover:bg-gray-50/80 transition">
+                    <td class="py-3 px-3 text-xs text-gray-500 font-mono">#<%= user.id %></td>
+                    <td class="py-3 px-3 text-sm font-bold text-gray-800 whitespace-nowrap"><%= user.full_name %></td>
+                    <td class="py-3 px-3 text-xs text-gray-600">
+                        <div class="font-medium text-gray-700"><%= user.email %></div>
+                        <% const wa = user.whatsapp || user.phone; %>
+                        <% if (wa) { %>
+                        <div class="flex items-center gap-1 text-[11px] text-emerald-600 mt-0.5">
+                            <i class="fab fa-whatsapp"></i>
+                            <span><%= wa %></span>
+                            <button onclick="copyToClipboard('<%= wa %>', 'Nomor WhatsApp')" class="text-gray-400 hover:text-gray-700 p-0.5" title="Copy WA">
+                                <i class="fas fa-copy text-[10px]"></i>
+                            </button>
+                        </div>
+                        <% } %>
+                    </td>
+                    <td class="py-3 px-3 text-xs whitespace-nowrap">
+                        <div class="flex items-center gap-2">
+                            <% if (user.user_type === 'dummy') { %>
+                            <span class="px-2 py-0.5 bg-amber-100 text-amber-800 border border-amber-200 rounded-full text-[11px] font-semibold">
+                                <i class="fas fa-robot mr-1"></i> Dummy
+                            </span>
+                            <button onclick="toggleUserStatus(<%= user.id %>, 'real')" class="text-[11px] bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200 px-2 py-0.5 rounded transition font-medium" title="Ubah ke Real">
+                                Make Real
+                            </button>
+                            <% } else { %>
+                            <span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full text-[11px] font-semibold">
+                                <i class="fas fa-user-check mr-1"></i> Real
+                            </span>
+                            <button onclick="toggleUserStatus(<%= user.id %>, 'dummy')" class="text-[11px] bg-amber-50 text-amber-700 hover:bg-amber-100 border border-amber-200 px-2 py-0.5 rounded transition font-medium" title="Ubah ke Dummy">
+                                Make Dummy
+                            </button>
+                            <% } %>
+                        </div>
+                    </td>
+                    <td class="py-3 px-3 text-xs whitespace-nowrap">
+                        <span class="font-bold text-green-600">Rp <%= parseInt(user.balance).toLocaleString('id-ID') %></span>
+                    </td>
+                    <td class="py-3 px-3 text-xs text-gray-600 whitespace-nowrap">
+                        <div class="font-medium text-gray-700"><%= user.bank_name || '-' %></div>
+                        <% if (user.bank_account_number) { %>
+                        <div class="flex items-center gap-1 text-[11px] text-gray-500 mt-0.5">
+                            <span class="font-mono bg-gray-100 px-1 py-0.2 rounded border border-gray-200"><%= user.bank_account_number %></span>
+                            <button onclick="copyToClipboard('<%= user.bank_account_number %>', 'No. Rekening')" class="text-gray-400 hover:text-gray-700 p-0.5" title="Copy Rekening">
+                                <i class="fas fa-copy text-[10px]"></i>
+                            </button>
+                        </div>
+                        <% } %>
+                    </td>
+                    <td class="py-3 px-3 text-xs whitespace-nowrap">
+                        <span class="px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-200 rounded font-mono text-[11px]">
+                            <%= user.referral_code %>
+                        </span>
+                    </td>
+                    <td class="py-3 px-3 text-xs text-gray-500 whitespace-nowrap">
+                        <%= new Date(user.created_at).toLocaleDateString('id-ID') %>
+                    </td>
+                    <td class="py-3 px-3 text-xs whitespace-nowrap">
+                        <% if (user.has_pin) { %>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full text-[11px] font-extrabold" title="User sudah memasang PIN 6-digit">
+                            <i class="fas fa-check-circle text-emerald-600"></i> PIN Set
+                        </span>
+                        <% } else { %>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-0.5 bg-red-100 text-red-800 border border-red-300 rounded-full text-[11px] font-extrabold" title="User belum memasang PIN">
+                            <i class="fas fa-times-circle text-red-600"></i> Belum Set
+                        </span>
+                        <% } %>
+                    </td>
+                    <td class="py-3 px-3 text-xs text-right whitespace-nowrap">
+                        <button onclick='editUser(<%= JSON.stringify({
+                            id: user.id,
+                            fullName: user.full_name,
+                            email: user.email,
+                            balance: user.balance,
+                            bankName: user.bank_name || "",
+                            bankAccount: user.bank_account_number || ""
+                        }) %>)'
+                            class="bg-emerald-500 hover:bg-emerald-600 text-white px-2.5 py-1 rounded text-xs mr-1 transition">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <% if (user.has_pin) { %>
+                        <button onclick="resetUserPin(<%= user.id %>, '<%= user.full_name %>')"
+                            class="bg-amber-500 hover:bg-amber-600 text-white px-2.5 py-1 rounded text-xs mr-1 transition font-bold" title="Reset PIN Transaksi User">
+                            <i class="fas fa-key"></i> Reset PIN
+                        </button>
+                        <% } else { %>
+                        <button disabled
+                            class="bg-gray-200 text-gray-400 border border-gray-300 px-2.5 py-1 rounded text-xs mr-1 cursor-not-allowed font-medium opacity-60" title="User Belum Memasang PIN">
+                            <i class="fas fa-key"></i> Reset PIN
+                        </button>
+                        <% } %>
+                        <button onclick="deleteUser(<%= user.id %>, '<%= user.full_name %>')"
+                            class="bg-red-500 hover:bg-red-600 text-white px-2.5 py-1 rounded text-xs transition">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-6 flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 pt-4 gap-4">
+        <div class="text-xs sm:text-sm text-gray-600">
+            Showing <%= totalRecords === 0 ? 0 : ((currentPage - 1) * 20) + 1 %> to <%= Math.min(currentPage * 20, totalRecords) %> of <%= totalRecords %> records
+        </div>
+        <div class="flex gap-1.5">
+            <% if (currentPage > 1) { %>
+                <a href="?page=<%= currentPage - 1 %>" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 rounded-lg text-xs font-semibold transition">Previous</a>
+            <% } else { %>
+                <span class="px-3 py-1.5 bg-gray-100 text-gray-400 rounded-lg text-xs font-semibold cursor-not-allowed">Previous</span>
+            <% } %>
+
+            <%
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            for (let i = startPage; i <= endPage; i++) { %>
+                <% if (i === currentPage) { %>
+                    <span class="px-3 py-1.5 bg-purple-600 text-white rounded-lg text-xs font-semibold"><%= i %></span>
+                <% } else { %>
+                    <a href="?page=<%= i %>" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 rounded-lg text-xs font-semibold transition"><%= i %></a>
+                <% } %>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+                <a href="?page=<%= currentPage + 1 %>" class="px-3 py-1.5 bg-gray-200 hover:bg-gray-300 rounded-lg text-xs font-semibold transition">Next</a>
+            <% } else { %>
+                <span class="px-3 py-1.5 bg-gray-100 text-gray-400 rounded-lg text-xs font-semibold cursor-not-allowed">Next</span>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden flex items-center justify-center z-50 p-4">
+    <div class="bg-white rounded-xl p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <h3 class="text-2xl font-bold mb-6 text-gray-800">
+            <i class="fas fa-user-edit text-emerald-600"></i> Edit User
+        </h3>
+
+        <div class="grid md:grid-cols-2 gap-4">
+            <!-- Nama Lengkap -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-user mr-1"></i> Nama Lengkap
+                </label>
+                <input type="text" id="editFullName" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+
+            <!-- Email -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-envelope mr-1"></i> Email
+                </label>
+                <input type="email" id="editEmail" required
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+
+            <!-- Balance -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-wallet mr-1"></i> Balance (Rp)
+                </label>
+                <input type="number" id="editBalance" min="0"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+
+            <!-- Nama Bank -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-university mr-1"></i> Nama Bank
+                </label>
+                <input type="text" id="editBankName" placeholder="Contoh: BCA, Mandiri, BRI"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+
+            <!-- Nomor Rekening -->
+            <div>
+                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                    <i class="fas fa-credit-card mr-1"></i> Nomor Rekening
+                </label>
+                <input type="text" id="editBankAccount" placeholder="Contoh: 1234567890"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+            </div>
+        </div>
+
+        <div class="flex gap-3 mt-6">
+            <button onclick="saveUser()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+                <i class="fas fa-save mr-2"></i> Simpan Perubahan
+            </button>
+            <button onclick="closeEditModal()" class="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold transition">
+                <i class="fas fa-times mr-2"></i> Batal
+            </button>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+<script>
+let editingUserId = null;
+
+function editUser(userData) {
+    editingUserId = userData.id;
+
+    document.getElementById('editFullName').value = userData.fullName;
+    document.getElementById('editEmail').value = userData.email;
+    document.getElementById('editBalance').value = userData.balance;
+    document.getElementById('editBankName').value = userData.bankName || '';
+    document.getElementById('editBankAccount').value = userData.bankAccount || '';
+
+    document.getElementById('editModal').classList.remove('hidden');
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.add('hidden');
+    editingUserId = null;
+}
+
+async function toggleUserStatus(userId, targetType) {
+    try {
+        const response = await fetch('/api/admin/users/toggle-type', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId, userType: targetType })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            showToast(result.message, 'success');
+            setTimeout(() => location.reload(), 800);
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (error) {
+        showToast('Error toggling user status', 'error');
+    }
+}
+
+async function saveUser() {
+    const fullName = document.getElementById('editFullName').value.trim();
+    const email = document.getElementById('editEmail').value.trim();
+    const balance = document.getElementById('editBalance').value;
+    const bankName = document.getElementById('editBankName').value.trim();
+    const bankAccount = document.getElementById('editBankAccount').value.trim();
+
+    if (!fullName || !email) {
+        showToast('Nama dan email harus diisi', 'error');
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/admin/users/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                userId: editingUserId,
+                fullName,
+                email,
+                balance,
+                bankName,
+                bankAccount
+            })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            showToast(result.message, 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (error) {
+        showToast('Error updating user', 'error');
+    }
+}
+
+async function resetUserPin(userId, userName) {
+    if (!confirm(`Apakah Anda yakin ingin mereset PIN Transaksi milik user "${userName}"? User harus membuat PIN baru di halaman Profil.`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/admin/users/reset-pin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            showToast(result.message, 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (error) {
+        showToast('Error resetting PIN', 'error');
+    }
+}
+
+async function deleteUser(userId, userName) {
+    if (!confirm(`Are you sure you want to delete user "${userName}"? This action cannot be undone.`)) {
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/admin/users/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ userId })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            showToast(result.message, 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (error) {
+        showToast('Error deleting user', 'error');
+    }
+}
+</script>
+
+<%- include('partials/footer') %>

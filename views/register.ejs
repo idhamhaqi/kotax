@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar - Kuotax | Marketplace Kuota Internet Indonesia</title>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Daftar sekarang di Kuotax dan dapatkan bonus 10GB kuota gratis! Platform marketplace kuota internet untuk mitra UMKM di seluruh Indonesia.">
+    <meta name="keywords" content="daftar kuotax, register kuotax, kuota internet, marketplace kuota, reseller kuota">
+    <meta name="author" content="Kuotax">
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Daftar - Kuotax | Marketplace Kuota Internet Indonesia">
+    <meta property="og:description" content="Platform marketplace kuota internet untuk mitra UMKM di seluruh Indonesia.">
+    <meta property="og:image" content="/ogimage.webp">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/icon.png">
+    <link rel="shortcut icon" href="/images/icon.png">
+
+    <link rel="stylesheet" href="/css/style.css?v=7">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass { background: rgba(255,255,255,0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
+
+        /* Shared input style */
+        .reg-input, .reg-select {
+            width: 100%; padding: 12px 36px 12px 14px; border-radius: 12px;
+            border: 1.5px solid #e5e7eb; background: #f9fafb; font-size: 14px;
+            outline: none; transition: all 0.2s;
+        }
+        .reg-input:focus, .reg-select:focus {
+            border-color: #10b981; background: #fff;
+            box-shadow: 0 0 0 3px rgba(16,185,129,0.1);
+        }
+        .reg-btn {
+            width: 100%; padding: 14px; border-radius: 12px;
+            background: #059669; color: #fff; font-weight: 700; font-size: 15px;
+            border: none; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .reg-btn:hover { background: #047857; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(5,150,105,0.3); }
+        .reg-btn:active { transform: translateY(0); }
+        .reg-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+        .reg-btn-outline {
+            width: 100%; padding: 14px; border-radius: 12px;
+            background: transparent; color: #059669; font-weight: 700; font-size: 15px;
+            border: 2px solid #059669; cursor: pointer; transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .reg-btn-outline:hover { background: #ecfdf5; }
+
+        /* Mobile wizard styles */
+        @media (max-width: 1023px) {
+            body.register-page { background: #f8fafb; margin: 0; }
+            .m-reg-hero {
+                background: linear-gradient(135deg, #059669 0%, #10b981 40%, #34d399 100%);
+                padding: 24px 20px 44px; position: relative; overflow: hidden;
+            }
+            .m-reg-hero::before {
+                content:''; position:absolute; top:-50px; right:-30px;
+                width:160px; height:160px; background:rgba(255,255,255,0.07); border-radius:50%;
+            }
+            .m-reg-form-wrapper {
+                margin-top: -24px; padding: 0 16px 32px; position: relative; z-index: 10;
+            }
+            .m-reg-card {
+                background: #fff; border-radius: 20px; padding: 24px 18px;
+                box-shadow: 0 4px 24px rgba(0,0,0,0.06); border: 1px solid #f0f0f0;
+            }
+            /* Step indicator */
+            .step-indicator { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 24px; }
+            .step-dot {
+                width: 8px; height: 8px; border-radius: 50%; background: #d1d5db; transition: all 0.3s;
+            }
+            .step-dot.active { width: 24px; border-radius: 4px; background: #059669; }
+            .step-dot.done { background: #10b981; }
+            /* Step panels */
+            .step-panel { display: none; }
+            .step-panel.active { display: block; animation: fadeIn 0.3s ease; }
+            @keyframes fadeIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+        }
+
+        /* Desktop styles */
+        @media (min-width: 1024px) {
+            .d-reg-split { display: flex; min-height: 100vh; }
+            .d-reg-branding {
+                width: 380px; flex-shrink: 0;
+                background: linear-gradient(135deg, #059669 0%, #10b981 40%, #34d399 100%);
+                display: flex; flex-direction: column; align-items: center; justify-content: center;
+                padding: 48px 32px; position: relative; overflow: hidden;
+            }
+            .d-reg-branding::before {
+                content:''; position:absolute; top:-80px; right:-40px;
+                width:250px; height:250px; background:rgba(255,255,255,0.06); border-radius:50%;
+            }
+            .d-reg-form-side {
+                flex: 1; display: flex; align-items: flex-start; justify-content: center;
+                padding: 48px; background: #f8fafb; overflow-y: auto;
+            }
+        }
+
+        /* Referral validation indicator */
+        .ref-status { font-size: 12px; margin-top: 6px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+        .ref-status.valid { color: #059669; }
+        .ref-status.invalid { color: #dc2626; }
+        .ref-status.loading { color: #6b7280; }
+
+        /* Password checklist */
+        .pwd-checklist { font-size: 11px; margin-top: 8px; color: #6b7280; display: none; }
+        .pwd-checklist.visible { display: block; }
+        .pwd-req { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+        .pwd-req.valid { color: #059669; }
+        .pwd-req.invalid { color: #dc2626; }
+    </style>
+</head>
+<body class="register-page">
+
+    <!-- ============================================ -->
+    <!-- MOBILE LAYOUT (< lg screens) - Multi-step -->
+    <!-- ============================================ -->
+    <div class="lg:hidden">
+        <!-- Hero -->
+        <div class="m-reg-hero">
+            <div class="relative z-10">
+                <a href="/login" class="inline-flex items-center gap-1 text-white/70 text-xs font-medium mb-4">
+                    <i class="fas fa-arrow-left text-[10px]"></i> Kembali
+                </a>
+                <img src="/images/logoa.png" alt="Kuotax" class="h-14 w-auto mb-3">
+                <h1 class="text-white text-lg font-bold">Buat Akun Baru</h1>
+                <p class="text-white/60 text-xs mt-1">Isi data diri Anda untuk bergabung</p>
+            </div>
+        </div>
+
+        <div class="m-reg-form-wrapper">
+
+            <div class="m-reg-card">
+                <!-- Step indicator -->
+                <div class="step-indicator">
+                    <div class="step-dot active" data-step="1"></div>
+                    <div class="step-dot" data-step="2"></div>
+                    <div class="step-dot" data-step="3"></div>
+                </div>
+
+                <form id="registerFormMobile">
+                    <!-- Step 1: Data Pribadi -->
+                    <div class="step-panel active" data-step="1">
+                        <h3 class="text-sm font-bold text-gray-800 mb-4">Data Pribadi</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Nama Lengkap (sesuai bank)</label>
+                                <input type="text" name="full_name" required class="reg-input" placeholder="Masukkan nama lengkap">
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Email</label>
+                                <input type="email" name="email" required class="reg-input" placeholder="nama@email.com">
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Nomor HP</label>
+                                <input type="tel" name="phone" required class="reg-input" placeholder="08123456789">
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Nomor WhatsApp</label>
+                                <input type="tel" name="whatsapp" required class="reg-input" placeholder="08123456789">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Provinsi</label>
+                                    <select name="province" required class="reg-select province-select"><option value="">Pilih Provinsi</option></select>
+                                </div>
+                                <div>
+                                    <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Kota</label>
+                                    <select name="city" required class="reg-select city-select" disabled><option value="">Pilih Kota</option></select>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="reg-btn mt-6 step-next-btn" data-next="2">
+                            Lanjut <i class="fas fa-arrow-right text-sm"></i>
+                        </button>
+                    </div>
+
+                    <!-- Step 2: Data Bank -->
+                    <div class="step-panel" data-step="2">
+                        <h3 class="text-sm font-bold text-gray-800 mb-4">Data Rekening Bank</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Nama Bank / E-Wallet</label>
+                                <select name="bank_name" required class="reg-select">
+                                    <option value="">Pilih Bank</option>
+                                    <%- include('partials/bank-options') %>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Nomor Rekening / Nomor E-Wallet</label>
+                                <input type="text" name="bank_account_number" required class="reg-input" placeholder="Masukkan nomor rekening">
+                            </div>
+                        </div>
+                        <div class="flex gap-3 mt-6">
+                            <button type="button" class="reg-btn-outline flex-1 step-prev-btn" data-prev="1">
+                                <i class="fas fa-arrow-left text-sm"></i> Kembali
+                            </button>
+                            <button type="button" class="reg-btn flex-1 step-next-btn" data-next="3">
+                                Lanjut <i class="fas fa-arrow-right text-sm"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Password & Referral -->
+                    <div class="step-panel" data-step="3">
+                        <h3 class="text-sm font-bold text-gray-800 mb-4">Password & Referral</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Password</label>
+                                <div class="relative">
+                                    <input type="password" name="password" id="mPassword" required class="reg-input pwd-input" placeholder="Masukkan password">
+                                    <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" onclick="togglePasswordVisibility(this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                                <div id="mPwdChecklist" class="pwd-checklist">
+                                    <div class="pwd-req invalid" data-req="length"><i class="fas fa-times-circle"></i> Minimal 8 karakter</div>
+                                    <div class="pwd-req invalid" data-req="uppercase"><i class="fas fa-times-circle"></i> Huruf besar & kecil</div>
+                                    <div class="pwd-req invalid" data-req="number"><i class="fas fa-times-circle"></i> Mengandung angka</div>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Ulangi Password</label>
+                                <div class="relative">
+                                    <input type="password" name="password_confirm" id="mPasswordConfirm" required class="reg-input pwd-confirm" placeholder="Ulangi password">
+                                    <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" onclick="togglePasswordVisibility(this)">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Kode Referral <span class="text-red-500">*Wajib</span></label>
+                                <input type="text" name="referral_code" id="referralCodeMobile" required class="reg-input referral-input" placeholder="Masukkan kode referral">
+                                <div id="referralStatusMobile" class="ref-status"></div>
+                            </div>
+                        </div>
+                        <div class="flex gap-3 mt-6">
+                            <button type="button" class="reg-btn-outline flex-1 step-prev-btn" data-prev="2">
+                                <i class="fas fa-arrow-left text-sm"></i> Kembali
+                            </button>
+                            <button type="submit" class="reg-btn flex-1 submit-btn" disabled>
+                                <i class="fas fa-user-plus"></i> Daftar
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <p class="text-center text-gray-400 text-xs mt-5">
+                Sudah punya akun? <a href="/login" class="text-emerald-600 font-bold">Masuk</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- DESKTOP LAYOUT (>= lg screens) -->
+    <!-- ============================================ -->
+    <div class="hidden lg:flex d-reg-split">
+        <!-- Left: Branding -->
+        <div class="d-reg-branding">
+            <div class="relative z-10 text-center">
+                <img src="/images/logoa.png" alt="Kuotax" class="h-24 w-auto mx-auto mb-5">
+                <h1 class="text-white text-2xl font-bold mb-2">Bergabung dengan Kuotax</h1>
+                <p class="text-white/70 text-sm max-w-xs mx-auto leading-relaxed">
+                    Daftar sekarang untuk memulai bisnis Anda
+                </p>
+
+            </div>
+        </div>
+
+        <!-- Right: Form -->
+        <div class="d-reg-form-side">
+            <div class="w-full max-w-2xl py-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-1">Buat Akun Baru</h2>
+                    <p class="text-gray-500 text-sm">Isi data diri Anda untuk bergabung</p>
+                </div>
+
+                <form id="registerFormDesktop" class="space-y-5">
+                    <!-- Row 1: Nama + Email -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 text-xs font-bold mb-1.5">Nama Lengkap (sesuai bank)</label>
+                            <input type="text" name="full_name" required class="reg-input" placeholder="Nama lengkap">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-xs font-bold mb-1.5">Email</label>
+                            <input type="email" name="email" required class="reg-input" placeholder="nama@email.com">
+                        </div>
+                    </div>
+
+                    <!-- Row 2: HP + WhatsApp -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 text-xs font-bold mb-1.5">Nomor HP</label>
+                            <input type="tel" name="phone" required class="reg-input" placeholder="08123456789">
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-xs font-bold mb-1.5">Nomor WhatsApp</label>
+                            <input type="tel" name="whatsapp" required class="reg-input" placeholder="08123456789">
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Provinsi + Kota -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 text-xs font-bold mb-1.5">Provinsi</label>
+                            <select name="province" required class="reg-select province-select"><option value="">Pilih Provinsi</option></select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-xs font-bold mb-1.5">Kota / Kabupaten</label>
+                            <select name="city" required class="reg-select city-select" disabled><option value="">Pilih Kota</option></select>
+                        </div>
+                    </div>
+
+                    <!-- Row 4: Bank + Rekening -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 text-xs font-bold mb-1.5">Nama Bank / E-Wallet</label>
+                            <select name="bank_name" required class="reg-select">
+                                <option value="">Pilih Bank</option>
+                                <%- include('partials/bank-options') %>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-xs font-bold mb-1.5">Nomor Rekening</label>
+                            <input type="text" name="bank_account_number" required class="reg-input" placeholder="Nomor rekening">
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Password + Confirm -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-gray-700 text-xs font-bold mb-1.5">Password</label>
+                            <div class="relative">
+                                <input type="password" name="password" id="dPassword" required class="reg-input pwd-input" placeholder="Masukkan password">
+                                <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" onclick="togglePasswordVisibility(this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div id="dPwdChecklist" class="pwd-checklist">
+                                <div class="pwd-req invalid" data-req="length"><i class="fas fa-times-circle"></i> Minimal 8 karakter</div>
+                                <div class="pwd-req invalid" data-req="uppercase"><i class="fas fa-times-circle"></i> Huruf besar & kecil</div>
+                                <div class="pwd-req invalid" data-req="number"><i class="fas fa-times-circle"></i> Mengandung angka</div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-gray-700 text-xs font-bold mb-1.5">Ulangi Password</label>
+                            <div class="relative">
+                                <input type="password" name="password_confirm" id="dPasswordConfirm" required class="reg-input pwd-confirm" placeholder="Ulangi password">
+                                <button type="button" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" onclick="togglePasswordVisibility(this)">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 6: Referral -->
+                    <div>
+                        <label class="block text-gray-700 text-xs font-bold mb-1.5">Kode Referral <span class="text-red-500">*Wajib</span></label>
+                        <input type="text" name="referral_code" id="referralCodeDesktop" required class="reg-input referral-input" placeholder="Masukkan kode referral">
+                        <div id="referralStatusDesktop" class="ref-status"></div>
+                    </div>
+
+                    <button type="submit" class="reg-btn submit-btn" disabled>
+                        <i class="fas fa-user-plus"></i> Daftar Sekarang
+                    </button>
+                </form>
+
+                <p class="text-center text-gray-500 mt-5 text-sm">
+                    Sudah punya akun? <a href="/login" class="text-emerald-600 font-bold hover:text-emerald-700">Masuk</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+    <script src="/js/toast.js?v=<%= Date.now() %>"></script>
+    <script src="/js/wilayah-data.js"></script>
+    <script>
+    // ==========================================
+    // Password visibility and requirements
+    // ==========================================
+    function togglePasswordVisibility(btn) {
+        const input = btn.previousElementSibling;
+        const icon = btn.querySelector('i');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    function updateReqUI(el, isValid) {
+        const icon = el.querySelector('i');
+        if (isValid) {
+            el.classList.remove('invalid');
+            el.classList.add('valid');
+            icon.className = 'fas fa-check-circle';
+        } else {
+            el.classList.remove('valid');
+            el.classList.add('invalid');
+            icon.className = 'fas fa-times-circle';
+        }
+    }
+
+    function initPasswordValidation() {
+        document.querySelectorAll('.pwd-input').forEach(input => {
+            const checklist = input.closest('div').nextElementSibling;
+            
+            input.addEventListener('focus', () => {
+                checklist.classList.add('visible');
+            });
+            
+            input.addEventListener('input', (e) => {
+                const val = e.target.value;
+                const reqLength = val.length >= 8;
+                const reqUpperLower = /[a-z]/.test(val) && /[A-Z]/.test(val);
+                const reqNumber = /[0-9]/.test(val);
+                
+                updateReqUI(checklist.querySelector('[data-req="length"]'), reqLength);
+                updateReqUI(checklist.querySelector('[data-req="uppercase"]'), reqUpperLower);
+                updateReqUI(checklist.querySelector('[data-req="number"]'), reqNumber);
+            });
+        });
+    }
+
+    // ==========================================
+    // Province/City dynamic dropdown
+    // ==========================================
+    function initWilayahDropdowns() {
+        document.querySelectorAll('.province-select').forEach(provSelect => {
+            // Populate provinces from WILAYAH_DATA
+            if (typeof WILAYAH_DATA !== 'undefined') {
+                Object.keys(WILAYAH_DATA).sort().forEach(prov => {
+                    const opt = document.createElement('option');
+                    opt.value = prov;
+                    opt.textContent = prov;
+                    provSelect.appendChild(opt);
+                });
+            }
+
+            // On province change, populate city dropdown
+            provSelect.addEventListener('change', function() {
+                const form = this.closest('form');
+                const citySelect = form.querySelector('.city-select');
+                citySelect.innerHTML = '<option value="">Pilih Kota</option>';
+
+                if (this.value && typeof WILAYAH_DATA !== 'undefined' && WILAYAH_DATA[this.value]) {
+                    WILAYAH_DATA[this.value].forEach(city => {
+                        const opt = document.createElement('option');
+                        opt.value = city;
+                        opt.textContent = city;
+                        citySelect.appendChild(opt);
+                    });
+                    citySelect.disabled = false;
+                } else {
+                    citySelect.disabled = true;
+                }
+            });
+        });
+    }
+
+    // ==========================================
+    // Referral code real-time validation
+    // ==========================================
+    let referralTimeout = null;
+    let referralValid = false;
+
+    function initReferralValidation() {
+        document.querySelectorAll('.referral-input').forEach(input => {
+            input.addEventListener('input', function() {
+                const code = this.value.trim();
+                const form = this.closest('form');
+                const statusEl = form.querySelector('.ref-status');
+                const submitBtns = form.querySelectorAll('.submit-btn');
+
+                clearTimeout(referralTimeout);
+                referralValid = false;
+                submitBtns.forEach(b => b.disabled = true);
+
+                if (!code) {
+                    if (statusEl) statusEl.innerHTML = '';
+                    return;
+                }
+
+                if (statusEl) statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memeriksa...';
+                if (statusEl) statusEl.className = 'ref-status loading';
+
+                referralTimeout = setTimeout(async () => {
+                    try {
+                        const res = await fetch('/api/auth/check-referral?code=' + encodeURIComponent(code));
+                        const result = await res.json();
+
+                        if (result.success) {
+                            if (statusEl) statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Valid — direferensikan oleh ' + result.owner;
+                            if (statusEl) statusEl.className = 'ref-status valid';
+                            referralValid = true;
+                            submitBtns.forEach(b => b.disabled = false);
+                        } else {
+                            if (statusEl) statusEl.innerHTML = '<i class="fas fa-times-circle"></i> ' + result.message;
+                            if (statusEl) statusEl.className = 'ref-status invalid';
+                            referralValid = false;
+                        }
+                    } catch (e) {
+                        if (statusEl) statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Gagal memeriksa';
+                        if (statusEl) statusEl.className = 'ref-status invalid';
+                    }
+                }, 500);
+            });
+        });
+    }
+
+    // ==========================================
+    // Mobile multi-step wizard
+    // ==========================================
+    function initStepWizard() {
+        document.querySelectorAll('.step-next-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const nextStep = parseInt(this.dataset.next);
+                const form = this.closest('form');
+                const currentPanel = this.closest('.step-panel');
+
+                // Basic validation of current step fields
+                const inputs = currentPanel.querySelectorAll('input[required], select[required]');
+                let valid = true;
+                inputs.forEach(inp => {
+                    if (!inp.value.trim()) {
+                        inp.style.borderColor = '#ef4444';
+                        valid = false;
+                        setTimeout(() => { inp.style.borderColor = ''; }, 2000);
+                    }
+                });
+                if (!valid) {
+                    showToast('Harap isi semua field yang wajib', 'error');
+                    return;
+                }
+
+                // Switch to next step
+                form.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+                form.querySelector('.step-panel[data-step="' + nextStep + '"]').classList.add('active');
+
+                // Update step indicator
+                const wrapper = form.closest('.m-reg-card') || form.closest('.m-reg-form-wrapper');
+                if (wrapper) {
+                    wrapper.querySelectorAll('.step-dot').forEach(dot => {
+                        const s = parseInt(dot.dataset.step);
+                        dot.classList.remove('active', 'done');
+                        if (s < nextStep) dot.classList.add('done');
+                        else if (s === nextStep) dot.classList.add('active');
+                    });
+                }
+            });
+        });
+
+        document.querySelectorAll('.step-prev-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const prevStep = parseInt(this.dataset.prev);
+                const form = this.closest('form');
+
+                form.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+                form.querySelector('.step-panel[data-step="' + prevStep + '"]').classList.add('active');
+
+                const wrapper = form.closest('.m-reg-card') || form.closest('.m-reg-form-wrapper');
+                if (wrapper) {
+                    wrapper.querySelectorAll('.step-dot').forEach(dot => {
+                        const s = parseInt(dot.dataset.step);
+                        dot.classList.remove('active', 'done');
+                        if (s < prevStep) dot.classList.add('done');
+                        else if (s === prevStep) dot.classList.add('active');
+                    });
+                }
+            });
+        });
+    }
+
+    // ==========================================
+    // Form submission
+    // ==========================================
+    function initFormSubmission() {
+        const forms = ['registerFormMobile', 'registerFormDesktop'];
+        forms.forEach(formId => {
+            const form = document.getElementById(formId);
+            if (!form) return;
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                if (!referralValid) {
+                    showToast('Kode referral harus valid sebelum mendaftar', 'error');
+                    return;
+                }
+
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                const btn = form.querySelector('button[type="submit"]');
+                const origText = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mendaftar...';
+                btn.disabled = true;
+
+                try {
+                    const response = await fetch('/api/auth/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showToast(result.message, 'success');
+                        window.dispatchEvent(new Event('registration-success'));
+                        setTimeout(() => { window.location.href = result.redirect || '/login'; }, 2000);
+                    } else {
+                        showToast(result.message, 'error');
+                        btn.innerHTML = origText;
+                        btn.disabled = false;
+                    }
+                } catch (error) {
+                    showToast('Terjadi kesalahan. Silakan coba lagi.', 'error');
+                    btn.innerHTML = origText;
+                    btn.disabled = false;
+                }
+            });
+        });
+    }
+
+    // ==========================================
+    // Cookie helpers for referral tracking
+    // ==========================================
+    function setCookie(name, value, days) {
+        const expires = new Date();
+        expires.setTime(expires.getTime() + (days * 24 * 60 * 60 * 1000));
+        document.cookie = name + '=' + value + ';expires=' + expires.toUTCString() + ';path=/';
+    }
+    function getCookie(name) {
+        const nameEQ = name + '=';
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length);
+        }
+        return null;
+    }
+
+    // ==========================================
+    // Init everything
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+        initWilayahDropdowns();
+        initReferralValidation();
+        initPasswordValidation();
+        initStepWizard();
+        initFormSubmission();
+
+        // Pre-fill referral code from URL or cookie
+        const urlParams = new URLSearchParams(window.location.search);
+        const urlRefCode = urlParams.get('ref');
+        if (urlRefCode) setCookie('referral_code', urlRefCode, 7);
+
+        const refCode = getCookie('referral_code') || urlRefCode;
+        if (refCode) {
+            document.querySelectorAll('.referral-input').forEach(input => {
+                input.value = refCode;
+                input.dispatchEvent(new Event('input')); // Trigger validation
+            });
+            if (urlRefCode) {
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+        }
+    });
+
+    window.addEventListener('registration-success', () => {
+        setCookie('referral_code', '', -1);
+    });
+    </script>
+</body>
+</html>

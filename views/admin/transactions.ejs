@@ -1,0 +1,129 @@
+<%- include('partials/header', { title: 'Transactions History', page: 'transactions' }) %>
+
+<h2 class="text-3xl font-bold text-gray-800 mb-8">Transactions History</h2>
+
+<div class="bg-white rounded-xl shadow-lg p-6">
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-gray-200">
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">ID</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">User</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Email</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Type</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Amount</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Quota Amount</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Provider</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Phone Number</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Description</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% transactions.forEach(transaction => { %>
+                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                    <td class="py-3 px-4 text-sm text-gray-600">#<%= transaction.id %></td>
+                    <td class="py-3 px-4 text-sm font-semibold text-gray-700"><%= transaction.user_name %></td>
+                    <td class="py-3 px-4 text-sm text-gray-600"><%= transaction.email %></td>
+                    <td class="py-3 px-4 text-sm">
+                        <% if (transaction.type === 'deposit') { %>
+                        <span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold">
+                            <i class="fas fa-arrow-down"></i> Deposit
+                        </span>
+                        <% } else if (transaction.type === 'withdrawal') { %>
+                        <span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold">
+                            <i class="fas fa-arrow-up"></i> Withdrawal
+                        </span>
+                        <% } else if (transaction.type === 'fill_order') { %>
+                        <span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold">
+                            <i class="fas fa-mobile-alt"></i> Fill Order
+                        </span>
+                        <% } else if (transaction.type === 'conversion') { %>
+                        <span class="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-semibold">
+                            <i class="fas fa-exchange-alt"></i> Conversion
+                        </span>
+                        <% } else { %>
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-semibold">
+                            <%= transaction.type %>
+                        </span>
+                        <% } %>
+                    </td>
+                    <td class="py-3 px-4 text-sm">
+                        <% if (transaction.amount) { %>
+                        <span class="font-bold <%= transaction.type === 'deposit' ? 'text-green-600' : 'text-red-600' %>">
+                            Rp <%= parseInt(transaction.amount).toLocaleString('id-ID') %>
+                        </span>
+                        <% } else { %>
+                        <span class="text-gray-400 text-xs">-</span>
+                        <% } %>
+                    </td>
+                    <td class="py-3 px-4 text-sm">
+                        <% if (transaction.quota_amount) { %>
+                        <span class="font-bold text-blue-600">
+                            <%= parseFloat(transaction.quota_amount).toFixed(2) %> GB
+                        </span>
+                        <% } else { %>
+                        <span class="text-gray-400 text-xs">-</span>
+                        <% } %>
+                    </td>
+                    <td class="py-3 px-4 text-sm text-gray-600">
+                        <%= transaction.provider || '-' %>
+                    </td>
+                    <td class="py-3 px-4 text-sm text-gray-600">
+                        <% if (transaction.phone_number) { %>
+                        <span class="font-mono text-xs"><%= transaction.phone_number %></span>
+                        <% } else { %>
+                        <span class="text-gray-400 text-xs">-</span>
+                        <% } %>
+                    </td>
+                    <td class="py-3 px-4 text-sm text-gray-600">
+                        <%= transaction.description || '-' %>
+                    </td>
+                    <td class="py-3 px-4 text-sm text-gray-600">
+                        <%= new Date(transaction.created_at).toLocaleDateString('id-ID') %>
+                        <br>
+                        <span class="text-xs text-gray-500">
+                            <%= new Date(transaction.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %>
+                        </span>
+                    </td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-6 flex items-center justify-between border-t border-gray-200 pt-4">
+        <div class="text-sm text-gray-600">
+            Showing <%= ((currentPage - 1) * 50) + 1 %> to <%= Math.min(currentPage * 50, totalRecords) %> of <%= totalRecords %> records
+        </div>
+        <div class="flex gap-2">
+            <% if (currentPage > 1) { %>
+                <a href="?page=<%= currentPage - 1 %>" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-semibold transition">Previous</a>
+            <% } else { %>
+                <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-semibold cursor-not-allowed">Previous</span>
+            <% } %>
+
+            <%
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            for (let i = startPage; i <= endPage; i++) { %>
+                <% if (i === currentPage) { %>
+                    <span class="px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-semibold"><%= i %></span>
+                <% } else { %>
+                    <a href="?page=<%= i %>" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-semibold transition"><%= i %></a>
+                <% } %>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+                <a href="?page=<%= currentPage + 1 %>" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-semibold transition">Next</a>
+            <% } else { %>
+                <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-semibold cursor-not-allowed">Next</span>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+<%- include('partials/footer') %>

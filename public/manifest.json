@@ -1,0 +1,40 @@
+{
+  "name": "KUOTAX",
+  "short_name": "KUOTAX",
+  "description": "Platform terpercaya untuk agregasi dan distribusi kuota digital - PT. Usaha Bersama Maju",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ecfdf5",
+  "theme_color": "#10b981",
+  "icons": [
+    {
+      "src": "/icons/android-launchericon-72-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/android-launchericon-144-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/android-launchericon-512-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/images/logoa.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["finance", "business", "utilities"],
+  "lang": "id-ID",
+  "dir": "ltr"
+}

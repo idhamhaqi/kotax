@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deposit - KUOTAX</title>
+    <%- include('partials/pwa-head') %>
+    <link rel="stylesheet" href="/css/style.css?v=6">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        #confirmModal {
+            backdrop-filter: blur(4px);
+            z-index: 60; /* Higher than deposit modal */
+        }
+        #depositModal {
+            backdrop-filter: blur(4px);
+            z-index: 50;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 min-h-screen">
+    <%- include('partials/sidebar', { page: 'deposit' }) %>
+
+    <!-- ============================================ -->
+    <!-- MOBILE LAYOUT (visible only on < lg screens) -->
+    <!-- ============================================ -->
+    <div class="lg:hidden bg-[#f8fafb] min-h-screen pb-24">
+        <!-- App Bar -->
+        <div class="bg-white border-b border-gray-100 px-4 py-4 sticky top-0 z-20 flex items-center justify-between">
+            <h1 class="text-lg font-bold text-gray-800 tracking-tight">Deposit</h1>
+            <div class="w-8 h-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i class="fas fa-wallet text-sm"></i>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <!-- Payment Methods Mobile -->
+            <div class="bg-white rounded-2xl p-4 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 mb-3">
+                <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2.5 px-1 flex items-center justify-between">
+                    <span><i class="fas fa-credit-card text-emerald-600 mr-1.5"></i> 1. Metode Pembayaran</span>
+                    <span id="selectedMethodMinMobile" class="text-[10px] text-gray-400 font-medium lowercase"></span>
+                </h3>
+                <div id="paymentMethodsMobile" class="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    <div class="col-span-3 text-center py-3 text-xs text-gray-400">Memuat metode...</div>
+                </div>
+            </div>
+
+            <!-- Deposit Form Mobile -->
+            <div class="bg-white rounded-2xl p-4 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 mb-6">
+                <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider mb-2.5 px-1">2. Nominal Deposit</h3>
+                <div class="space-y-2.5">
+                    <div class="grid grid-cols-3 gap-2">
+                        <button onclick="selectDeposit(100000)" class="py-2.5 rounded-xl bg-gray-50 border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 transition active:scale-95 text-xs font-bold text-gray-700">Rp 100rb</button>
+                        <button onclick="selectDeposit(200000)" class="py-2.5 rounded-xl bg-gray-50 border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 transition active:scale-95 text-xs font-bold text-gray-700">Rp 200rb</button>
+                        <button onclick="selectDeposit(500000)" class="py-2.5 rounded-xl bg-gray-50 border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 transition active:scale-95 text-xs font-bold text-gray-700">Rp 500rb</button>
+                        <button onclick="selectDeposit(1000000)" class="py-2.5 rounded-xl bg-gray-50 border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 transition active:scale-95 text-xs font-bold text-gray-700">Rp 1 Juta</button>
+                        <button onclick="selectDeposit(2000000)" class="py-2.5 rounded-xl bg-gray-50 border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 transition active:scale-95 text-xs font-bold text-gray-700">Rp 2 Juta</button>
+                        <button onclick="selectDeposit(5000000)" class="py-2.5 rounded-xl bg-gray-50 border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50 transition active:scale-95 text-xs font-bold text-gray-700">Rp 5 Juta</button>
+                    </div>
+                    <div class="flex gap-2 pt-1">
+                        <input type="number" id="customAmountInputMobile" placeholder="Ketik nominal kustom..." min="10000" step="5000"
+                            class="flex-1 px-3 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-xs font-semibold">
+                        <button onclick="submitCustomDeposit('Mobile')" class="px-4 py-2 rounded-xl bg-emerald-600 text-white font-bold text-xs hover:bg-emerald-700 transition">
+                            Lanjut
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Section Mobile -->
+            <h3 class="text-sm font-bold text-gray-800 mb-3 px-1">Riwayat Deposit</h3>
+            <div id="depositHistoryMobile" class="space-y-3"></div>
+            <div id="loadMoreContainerMobile" class="hidden mt-4 text-center">
+                <button id="loadMoreBtnMobile" class="px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-xs font-semibold shadow-sm">
+                    Muat Lebih Banyak
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- DESKTOP LAYOUT (visible only on >= lg screens) -->
+    <!-- ============================================ -->
+    <div class="hidden lg:block lg:ml-64 p-8 pb-8">
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Deposit</h1>
+            <p class="text-gray-600">Tambah saldo ke akun Anda</p>
+        </div>
+
+        <!-- Payment Methods Selector Desktop -->
+        <div class="glass rounded-2xl p-6 shadow-lg mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fas fa-credit-card text-emerald-600"></i> 1. Pilih Metode Pembayaran
+            </h3>
+            <div id="paymentMethodsDesktop" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div class="col-span-full text-center py-6 text-sm text-gray-400">Memuat metode pembayaran...</div>
+            </div>
+        </div>
+
+        <!-- Deposit Form -->
+        <div class="glass rounded-2xl p-6 shadow-lg mb-8">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fas fa-money-bill-wave text-green-600"></i> 2. Pilih Nominal Deposit
+            </h3>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <button onclick="selectDeposit(100000)" class="deposit-btn p-4 rounded-lg bg-white border-2 border-gray-300 hover:border-emerald-500 transition">
+                    <p class="font-bold text-gray-800">Rp 100.000</p>
+                </button>
+                <button onclick="selectDeposit(200000)" class="deposit-btn p-4 rounded-lg bg-white border-2 border-gray-300 hover:border-emerald-500 transition">
+                    <p class="font-bold text-gray-800">Rp 200.000</p>
+                </button>
+                <button onclick="selectDeposit(300000)" class="deposit-btn p-4 rounded-lg bg-white border-2 border-gray-300 hover:border-emerald-500 transition">
+                    <p class="font-bold text-gray-800">Rp 300.000</p>
+                </button>
+                <button onclick="selectDeposit(400000)" class="deposit-btn p-4 rounded-lg bg-white border-2 border-gray-300 hover:border-emerald-500 transition">
+                    <p class="font-bold text-gray-800">Rp 400.000</p>
+                </button>
+                <button onclick="selectDeposit(500000)" class="deposit-btn p-4 rounded-lg bg-white border-2 border-gray-300 hover:border-emerald-500 transition">
+                    <p class="font-bold text-gray-800">Rp 500.000</p>
+                </button>
+                <button onclick="selectDeposit(1000000)" class="deposit-btn p-4 rounded-lg bg-white border-2 border-gray-300 hover:border-emerald-500 transition">
+                    <p class="font-bold text-gray-800">Rp 1.000.000</p>
+                </button>
+                <button onclick="selectDeposit(2000000)" class="deposit-btn p-4 rounded-lg bg-white border-2 border-gray-300 hover:border-emerald-500 transition">
+                    <p class="font-bold text-gray-800">Rp 2.000.000</p>
+                </button>
+                <button onclick="selectDeposit(4000000)" class="deposit-btn p-4 rounded-lg bg-white border-2 border-gray-300 hover:border-emerald-500 transition">
+                    <p class="font-bold text-gray-800">Rp 4.000.000</p>
+                </button>
+                <button onclick="selectDeposit(10000000)" class="deposit-btn p-4 rounded-lg bg-white border-2 border-gray-300 hover:border-emerald-500 transition">
+                    <p class="font-bold text-gray-800">Rp 10.000.000</p>
+                </button>
+                <button onclick="selectDeposit(50000000)" class="deposit-btn p-4 rounded-lg bg-white border-2 border-gray-300 hover:border-emerald-500 transition">
+                    <p class="font-bold text-gray-800">Rp 50.000.000</p>
+                </button>
+            </div>
+        </div>
+
+        <!-- Deposit History -->
+        <div class="glass rounded-2xl p-6 shadow-lg">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fas fa-history text-emerald-600"></i> Riwayat Deposit
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left py-3 px-2 text-sm font-semibold text-gray-600">Tanggal</th>
+                            <th class="text-left py-3 px-2 text-sm font-semibold text-gray-600">Nominal</th>
+                            <th class="text-left py-3 px-2 text-sm font-semibold text-gray-600">Jumlah Transfer</th>
+                            <th class="text-left py-3 px-2 text-sm font-semibold text-gray-600">Status</th>
+                            <th class="text-right py-3 px-2 text-sm font-semibold text-gray-600">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="depositHistoryDesktop"></tbody>
+                </table>
+            </div>
+            <!-- Pagination (Desktop) -->
+            <div id="paginationContainerDesktop" class="hidden mt-6 flex items-center justify-between border-t border-gray-150 pt-4">
+                <div class="text-sm text-gray-600" id="paginationInfoDesktop"></div>
+                <div class="flex gap-1" id="paginationPagesDesktop"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-emerald-600 to-green-600 text-white p-6 rounded-t-2xl">
+                <h3 class="text-xl font-bold">
+                    <i class="fas fa-question-circle mr-2"></i> Konfirmasi Deposit
+                </h3>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-6">
+                <div class="mb-6">
+                    <div class="flex items-center justify-center mb-4">
+                        <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center">
+                            <i class="fas fa-money-bill-wave text-3xl text-emerald-600"></i>
+                        </div>
+                    </div>
+                    <p class="text-center text-gray-700 mb-3">
+                        Anda akan melakukan deposit sebesar:
+                    </p>
+                    <p class="text-center text-3xl font-bold text-emerald-600 mb-4" id="confirmAmount">
+                        Rp 100.000
+                    </p>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm text-gray-700">
+                        <i class="fas fa-info-circle text-blue-600 mr-2"></i>
+                        Setelah menekan <strong>Lanjutkan</strong>, Anda akan menerima informasi rekening tujuan transfer.
+                    </div>
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-3">
+                    <button onclick="cancelConfirmation()"
+                        class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition">
+                        <i class="fas fa-times-circle mr-2"></i> Batal
+                    </button>
+                    <button onclick="acceptConfirmation()"
+                        class="flex-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700 text-white font-semibold py-3 px-6 rounded-lg transition">
+                        <i class="fas fa-check-circle mr-2"></i> Lanjutkan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deposit Modal -->
+    <div id="depositModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-emerald-600 to-green-600 text-white p-6 rounded-t-2xl">
+                <h3 class="text-xl font-bold"><i class="fas fa-money-bill-wave mr-2"></i> Konfirmasi Deposit</h3>
+            </div>
+
+            <!-- Modal Content -->
+            <div class="p-6">
+                <!-- Payment Info -->
+                <div id="paymentInfo" class="mb-6">
+                    <div class="bg-emerald-50 border border-emerald-200 rounded-lg p-4 mb-4">
+                        <h4 class="font-bold text-gray-800 mb-3 flex items-center justify-between">
+                            <span><i class="fas fa-info-circle text-emerald-600"></i> Informasi Transfer</span>
+                            <span id="modalPaymentBadge" class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-200 text-emerald-800 font-bold"></span>
+                        </h4>
+
+                        <!-- QRIS QR Code Image Container -->
+                        <div id="modalQrisContainer" class="hidden text-center my-2.5 p-3.5 bg-white rounded-2xl border border-purple-200 shadow-md">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-extrabold uppercase tracking-wider mb-2.5">
+                                <i class="fas fa-qrcode"></i> Scan QRIS Di Bawah Ini
+                            </span>
+                            <div class="relative inline-block p-2.5 bg-white rounded-2xl border-2 border-purple-300 shadow-inner">
+                                <img id="modalQrCodeImg" src="" alt="QRIS Code" class="w-56 h-56 sm:w-64 sm:h-64 object-contain mx-auto rounded-xl">
+                            </div>
+                            <p id="modalQrisHint" class="text-xs font-semibold text-purple-700 mt-2 flex items-center justify-center gap-1 whitespace-nowrap overflow-hidden text-ellipsis">
+                                <i class="fas fa-check-circle text-emerald-500"></i> Nominal otomatis terisi
+                            </p>
+                            <button type="button" onclick="downloadQrisImage()" class="mt-2.5 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs shadow-md transition active:scale-95">
+                                <i class="fas fa-download"></i> Simpan / Download QRIS
+                            </button>
+                        </div>
+
+                        <div class="space-y-2.5 text-xs sm:text-sm">
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500 font-medium">Metode Pembayaran:</span>
+                                <span class="font-bold text-gray-900" id="modalBankName"></span>
+                            </div>
+
+                            <div id="modalAccountNumberRow" class="flex justify-between items-center">
+                                <span class="text-gray-500 font-medium">No. Rekening / No. HP:</span>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="font-bold font-mono text-gray-900 text-sm sm:text-base" id="modalBankAccount"></span>
+                                    <button type="button" onclick="copyModalField('modalBankAccount', 'Nomor Rekening')" class="text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2 py-0.5 rounded text-xs font-bold transition flex items-center gap-1">
+                                        <i class="fas fa-copy text-[10px]"></i> Salin
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="flex justify-between items-center">
+                                <span class="text-gray-500 font-medium">Atas Nama:</span>
+                                <span class="font-bold text-gray-900" id="modalAccountHolder"></span>
+                            </div>
+
+                            <div id="modalUniqueAmountBox" class="p-3 bg-white rounded-xl border border-emerald-300 shadow-sm">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-bold text-emerald-800 uppercase tracking-wide">Jumlah Transfer Persis</span>
+                                    <button type="button" onclick="copyUniqueAmountRaw()" class="text-emerald-700 bg-emerald-100 hover:bg-emerald-200 px-2.5 py-1 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                                        <i class="fas fa-copy"></i> Salin Nominal
+                                    </button>
+                                </div>
+                                <div class="flex items-baseline justify-between">
+                                    <p class="font-extrabold text-2xl text-emerald-600 font-mono tracking-tight" id="modalUniqueAmount"></p>
+                                    <span class="text-[10px] text-gray-400 font-medium">(Termasuk Kode Unik)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-xs sm:text-sm text-gray-700">
+                        <i class="fas fa-bolt text-yellow-600 mr-1"></i>
+                        <strong>Penting:</strong> Proses <strong>VERIFIKASI OTOMATIS</strong> oleh sistem. Pastikan nominal transfer <strong>PERSIS SAMA</strong> agar saldo langsung bertambah!
+                    </div>
+                </div>
+
+                <!-- Contact Info (if no payment method) -->
+                <div id="contactInfo" class="mb-6 hidden">
+                    <div class="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-300 rounded-lg p-5">
+                        <p class="text-sm text-gray-700 mb-4 text-center">
+                            Silakan hubungi admin di Telegram untuk info rekening tujuan
+                        </p>
+
+                        <a id="telegramLink" href="#" target="_blank" rel="noopener noreferrer"
+                            class="flex items-center justify-center gap-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold py-4 px-6 rounded-xl transition transform hover:scale-105 shadow-lg mb-4">
+                            <i class="fab fa-telegram text-3xl"></i>
+                            <div class="text-left">
+                                <div class="text-xs opacity-90">Hubungi Admin</div>
+                                <div class="text-lg" id="modalAdminContactUsername">@admin</div>
+                            </div>
+                        </a>
+
+                        <div class="bg-white rounded-lg p-3 border border-emerald-200">
+                            <p class="text-sm text-gray-600 text-center">
+                                Jumlah transfer: <span class="font-bold text-xl text-emerald-600" id="modalUniqueAmountContact"></span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Form -->
+                <form id="uploadForm" class="space-y-4">
+                    <input type="hidden" id="depositAmount" name="amount">
+                    <input type="hidden" id="depositUniqueAmount" name="uniqueAmount">
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-user-tag text-green-600"></i> Nama Pengirim / Atas Nama Rekening
+                        </label>
+                        <input type="text" id="senderName" name="senderName" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            placeholder="Contoh: Budi Santoso">
+                        <p class="text-xs text-gray-500 mt-1">Masukkan nama pemilik rekening yang digunakan untuk transfer</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">
+                            <i class="fas fa-image text-green-600"></i> Upload Bukti Transfer
+                        </label>
+                        <input type="file" id="proofFile" name="proof" accept="image/*" required
+                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        <p class="text-xs text-gray-500 mt-1">Format: JPG, PNG, WebP (Max: 5MB)</p>
+                    </div>
+
+                    <!-- Image Preview -->
+                    <div id="imagePreview" class="hidden">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Preview:</label>
+                        <img id="previewImg" src="" alt="Preview" class="max-w-full h-auto rounded-lg border border-gray-300">
+                    </div>
+
+                    <!-- Buttons -->
+                    <div class="flex gap-3 mt-6">
+                        <button type="submit" id="confirmBtn"
+                            class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-lg transition">
+                            <i class="fas fa-check-circle mr-2"></i> Konfirmasi Transfer
+                        </button>
+                        <button type="button" onclick="closeModal()"
+                            class="flex-1 bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition">
+                            <i class="fas fa-times-circle mr-2"></i> Tutup
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cancel Confirmation Modal -->
+    <div id="cancelDepositModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <i class="fas fa-exclamation-triangle text-3xl text-red-500"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">Batalkan Deposit?</h3>
+            <p class="text-gray-500 mb-6 text-sm">Anda yakin ingin membatalkan request deposit ini? Data yang dibatalkan tidak dapat dikembalikan.</p>
+            <div class="flex gap-3">
+                <button onclick="closeCancelModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-xl transition">
+                    Tutup
+                </button>
+                <button id="btnConfirmCancel" class="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 rounded-xl transition shadow-lg shadow-red-200">
+                    Ya, Batalkan
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+    <script src="/js/toast.js?v=<%= Date.now() %>"></script>
+    <script>
+        let currentDeposit = null;
+        let confirmationResolve = null; // For promise-based confirmation
+        let availablePaymentMethods = [];
+        let selectedPaymentMethodId = null;
+
+        async function loadPaymentMethods() {
+            try {
+                const response = await fetch('/api/deposit/methods');
+                const result = await response.json();
+                if (result.success && result.methods && result.methods.length > 0) {
+                    availablePaymentMethods = result.methods;
+                    selectedPaymentMethodId = availablePaymentMethods[0].id;
+                    renderPaymentMethods();
+                } else {
+                    const mobileEl = document.getElementById('paymentMethodsMobile');
+                    const desktopEl = document.getElementById('paymentMethodsDesktop');
+                    if (mobileEl) mobileEl.innerHTML = '<div class="col-span-2 text-center py-4 text-xs text-red-500 font-semibold">Tidak ada metode pembayaran aktif</div>';
+                    if (desktopEl) desktopEl.innerHTML = '<div class="col-span-full text-center py-6 text-sm text-red-500 font-semibold">Tidak ada metode pembayaran aktif. Silakan hubungi admin.</div>';
+                }
+            } catch (err) {
+                console.error('Error loading payment methods:', err);
+            }
+        }
+
+        function renderPaymentMethods() {
+            const mobileContainer = document.getElementById('paymentMethodsMobile');
+            const desktopContainer = document.getElementById('paymentMethodsDesktop');
+
+            if (!availablePaymentMethods || availablePaymentMethods.length === 0) return;
+
+            let mobileHTML = '';
+            let desktopHTML = '';
+
+            const activeObj = availablePaymentMethods.find(m => m.id === selectedPaymentMethodId);
+            const minEl = document.getElementById('selectedMethodMinMobile');
+            if (minEl && activeObj) {
+                minEl.textContent = `min. deposit Rp ${parseInt(activeObj.min_deposit || 100000).toLocaleString('id-ID')}`;
+            }
+
+            availablePaymentMethods.forEach(m => {
+                const isSelected = m.id === selectedPaymentMethodId;
+                const borderClass = isSelected 
+                    ? 'border-emerald-500 bg-emerald-50/80 ring-2 ring-emerald-500 shadow-sm' 
+                    : 'border-gray-200 bg-gray-50/50 hover:border-emerald-300';
+                
+                const iconContent = m.logo_url 
+                    ? `<img src="${m.logo_url}" alt="${m.name}" class="h-6 w-auto object-contain max-w-[85%]">`
+                    : `<span class="font-bold text-xs ${isSelected ? 'text-emerald-700' : 'text-gray-700'}">${m.name.substring(0, 4).toUpperCase()}</span>`;
+                
+                const catBadge = m.category === 'QRIS' 
+                    ? '<span class="text-[8px] bg-purple-100 text-purple-700 font-bold px-1 rounded">QRIS</span>'
+                    : `<span class="text-[8px] bg-emerald-100 text-emerald-700 font-bold px-1 rounded">${m.category}</span>`;
+
+                // Compact Mobile Card (Square / Pill)
+                mobileHTML += `
+                    <div onclick="selectPaymentMethod(${m.id})" class="cursor-pointer py-2 px-1.5 rounded-xl border ${borderClass} transition relative text-center flex flex-col items-center justify-center gap-0.5">
+                        ${isSelected ? '<span class="absolute top-1 right-1 w-3.5 h-3.5 bg-emerald-600 text-white rounded-full flex items-center justify-center text-[8px]"><i class="fas fa-check"></i></span>' : ''}
+                        <div class="h-6 flex items-center justify-center">${iconContent}</div>
+                        <p class="text-[11px] font-bold text-gray-800 truncate w-full tracking-tight leading-tight">${m.name}</p>
+                    </div>
+                `;
+
+                // Desktop Card
+                desktopHTML += `
+                    <div onclick="selectPaymentMethod(${m.id})" class="cursor-pointer p-4 rounded-xl border-2 ${borderClass} transition relative flex items-center gap-3">
+                        ${isSelected ? '<i class="fas fa-check-circle text-emerald-600 text-base"></i>' : ''}
+                        <div class="shrink-0">
+                            ${m.logo_url ? `<img src="${m.logo_url}" alt="${m.name}" class="w-10 h-10 object-contain rounded-lg border border-gray-100 bg-white p-1">` : `<div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 font-bold text-sm flex items-center justify-center">${m.name.substring(0, 2).toUpperCase()}</div>`}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <p class="text-sm font-bold text-gray-900 truncate">${m.name}</p>
+                                ${catBadge}
+                            </div>
+                            <p class="text-xs text-gray-500 font-medium">Min. Rp ${parseInt(m.min_deposit || 100000).toLocaleString('id-ID')}</p>
+                        </div>
+                    </div>
+                `;
+            });
+
+            if (mobileContainer) mobileContainer.innerHTML = mobileHTML;
+            if (desktopContainer) desktopContainer.innerHTML = desktopHTML;
+        }
+
+        function submitCustomDeposit(device) {
+            const input = document.getElementById(`customAmountInput${device}`);
+            if (!input || !input.value) {
+                showToast('Masukkan nominal deposit terlebih dahulu', 'error');
+                return;
+            }
+            const val = parseInt(input.value);
+            const chosenMethod = availablePaymentMethods.find(m => m.id === selectedPaymentMethodId);
+            const minDep = chosenMethod ? parseFloat(chosenMethod.min_deposit || 100000) : 100000;
+
+            if (isNaN(val) || val < minDep) {
+                showToast(`Minimal deposit untuk ${chosenMethod ? chosenMethod.name : 'metode ini'} adalah Rp ${parseInt(minDep).toLocaleString('id-ID')}`, 'error');
+                return;
+            }
+            selectDeposit(val);
+        }
+
+        function selectPaymentMethod(id) {
+            selectedPaymentMethodId = id;
+            renderPaymentMethods();
+        }
+
+        // Helper to copy modal fields to clipboard
+        function copyModalField(elementId, labelName) {
+            const text = document.getElementById(elementId)?.textContent?.trim();
+            if (!text) return;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(`${labelName} berhasil disalin!`, 'success');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast(`${labelName} berhasil disalin!`, 'success');
+            });
+        }
+
+        // Helper to copy raw integer unique amount (for mobile banking input)
+        function copyUniqueAmountRaw() {
+            if (!currentDeposit || !currentDeposit.uniqueAmount) {
+                const elText = document.getElementById('modalUniqueAmount')?.textContent?.replace(/\D/g, '');
+                if (elText) {
+                    navigator.clipboard.writeText(elText);
+                    showToast(`Jumlah transfer Rp ${parseInt(elText).toLocaleString('id-ID')} berhasil disalin!`, 'success');
+                }
+                return;
+            }
+            const rawAmount = parseInt(currentDeposit.uniqueAmount).toString();
+            navigator.clipboard.writeText(rawAmount).then(() => {
+                showToast(`Jumlah transfer Rp ${parseInt(rawAmount).toLocaleString('id-ID')} berhasil disalin!`, 'success');
+            }).catch(() => {
+                const textarea = document.createElement('textarea');
+                textarea.value = rawAmount;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast(`Jumlah transfer Rp ${parseInt(rawAmount).toLocaleString('id-ID')} berhasil disalin!`, 'success');
+            });
+        }
+
+        // Helper to download QRIS image for mobile users
+        function downloadQrisImage() {
+            const img = document.getElementById('modalQrCodeImg');
+            if (!img || !img.src) {
+                showToast('Gambar QRIS belum dimuat', 'error');
+                return;
+            }
+
+            const link = document.createElement('a');
+            link.href = img.src;
+            const amtStr = currentDeposit ? currentDeposit.uniqueAmount : 'qris';
+            link.download = `qris-kuotax-rp${amtStr}.png`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Gambar QRIS berhasil di-download! Silakan scan lewat Galeri aplikasi m-Banking/E-Wallet Anda.', 'success');
+        }
+
+        // Format amount: 100257 -> "100.257" (tanpa desimal)
+        function formatUniqueAmount(amount) {
+            if (!amount || amount === '' || isNaN(amount)) {
+                return '0';
+            }
+
+            const amountInt = parseInt(amount);
+            if (isNaN(amountInt)) {
+                return '0';
+            }
+
+            const amountStr = amountInt.toString();
+            if (amountStr.length <= 3) return amountStr;
+
+            const lastThree = amountStr.slice(-3);
+            const remaining = amountStr.slice(0, -3);
+            return remaining.replace(/\B(?=(\d{3})+(?!\d))/g, '.') + '.' + lastThree;
+        }
+
+        // File preview
+        document.getElementById('proofFile').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('previewImg').src = e.target.result;
+                    document.getElementById('imagePreview').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            } else {
+                document.getElementById('imagePreview').classList.add('hidden');
+            }
+        });
+
+        // Show custom confirmation modal
+        function showConfirmModal(amount) {
+            return new Promise((resolve) => {
+                confirmationResolve = resolve;
+
+                document.getElementById('confirmAmount').textContent =
+                    'Rp ' + amount.toLocaleString('id-ID');
+
+                const modal = document.getElementById('confirmModal');
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            });
+        }
+
+        // Handle confirmation accept
+        function acceptConfirmation() {
+            const modal = document.getElementById('confirmModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            if (confirmationResolve) {
+                confirmationResolve(true);
+                confirmationResolve = null;
+            }
+        }
+
+        // Handle confirmation cancel
+        function cancelConfirmation() {
+            const modal = document.getElementById('confirmModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+
+            if (confirmationResolve) {
+                confirmationResolve(false);
+                confirmationResolve = null;
+            }
+        }
+
+        async function selectDeposit(amount) {
+            if (!selectedPaymentMethodId) {
+                showToast('Silakan pilih metode pembayaran terlebih dahulu', 'error');
+                return;
+            }
+
+            const chosenMethod = availablePaymentMethods.find(m => m.id === selectedPaymentMethodId);
+            if (chosenMethod && amount < chosenMethod.min_deposit) {
+                showToast(`Minimal deposit untuk ${chosenMethod.name} adalah Rp ${parseInt(chosenMethod.min_deposit).toLocaleString('id-ID')}`, 'error');
+                return;
+            }
+
+            const confirmed = await showConfirmModal(amount);
+
+            if (!confirmed) {
+                return; // User cancel
+            }
+
+            try {
+                const response = await fetch('/api/deposit/initiate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount, paymentMethodId: selectedPaymentMethodId })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    currentDeposit = result.deposit;
+                    showModal(result.deposit);
+
+                    loadDesktopDepositHistory(1);
+                    loadMobileDepositHistory(false);
+                } else {
+                    showToast(result.message || 'Gagal membuat deposit', 'error');
+                }
+            } catch (error) {
+                console.error('Error initiating deposit:', error);
+                showToast('Terjadi kesalahan. Silakan coba lagi.', 'error');
+            }
+        }
+
+        // Confirm existing deposit (untuk deposit yang sudah initiated)
+        async function confirmExistingDeposit(depositId) {
+            try {
+                const response = await fetch('/api/deposit/initiated');
+                const result = await response.json();
+
+                if (result.success) {
+                    const deposit = result.deposits.find(d => d.id === depositId);
+                    if (deposit) {
+                        const normalizedDeposit = {
+                            id: deposit.id,
+                            amount: deposit.amount,
+                            uniqueAmount: deposit.unique_amount,
+                            status: deposit.status,
+                            paymentMethod: result.paymentMethod,
+                            adminContact: result.adminContact
+                        };
+                        currentDeposit = normalizedDeposit;
+                        showModal(normalizedDeposit);
+                    } else {
+                        showToast('Deposit tidak ditemukan', 'error');
+                    }
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error loading deposit:', error);
+                showToast('Error loading deposit', 'error');
+            }
+        }
+
+        function showModal(deposit) {
+            console.log('showModal called with deposit:', deposit);
+
+            const modal = document.getElementById('depositModal');
+            const paymentInfo = document.getElementById('paymentInfo');
+            const contactInfo = document.getElementById('contactInfo');
+
+            if (!deposit || !deposit.amount || !deposit.uniqueAmount) {
+                showToast('Data deposit tidak valid', 'error');
+                return;
+            }
+
+            document.getElementById('depositAmount').value = deposit.amount;
+            document.getElementById('depositUniqueAmount').value = deposit.uniqueAmount;
+
+            const formattedAmount = 'Rp ' + formatUniqueAmount(deposit.uniqueAmount);
+
+            if (deposit.paymentMethod) {
+                paymentInfo.classList.remove('hidden');
+                contactInfo.classList.add('hidden');
+
+                const pm = deposit.paymentMethod;
+                const isQris = (pm.category === 'QRIS' || Boolean(pm.qrCodeUrl));
+
+                document.getElementById('modalBankName').textContent = pm.name || pm.bankName || 'Payment Method';
+                document.getElementById('modalAccountHolder').textContent = pm.accountHolder || '-';
+                document.getElementById('modalUniqueAmount').textContent = formattedAmount;
+
+                const modalBadge = document.getElementById('modalPaymentBadge');
+                if (modalBadge) modalBadge.textContent = pm.category || 'Aktif';
+
+                const qrisContainer = document.getElementById('modalQrisContainer');
+                const accRow = document.getElementById('modalAccountNumberRow');
+
+                const qrisUrl = deposit.qrisDataUrl || pm.qrCodeUrl;
+                const isDynamic = deposit.isDynamicQris || pm.isDynamicQris;
+
+                if (isQris && qrisUrl) {
+                    qrisContainer.classList.remove('hidden');
+                    document.getElementById('modalQrCodeImg').src = qrisUrl;
+                    
+                    const hintEl = document.getElementById('modalQrisHint');
+                    if (hintEl) {
+                        if (isDynamic) {
+                            hintEl.innerHTML = '<i class="fas fa-check-circle text-emerald-500"></i> Nominal Rp ' + formatUniqueAmount(deposit.uniqueAmount) + ' otomatis terisi';
+                        } else {
+                            hintEl.innerHTML = '<i class="fas fa-info-circle text-purple-500"></i> Masukkan Rp ' + formatUniqueAmount(deposit.uniqueAmount) + ' saat transfer';
+                        }
+                    }
+                    if (accRow) accRow.classList.add('hidden');
+                } else {
+                    qrisContainer.classList.add('hidden');
+                    if (accRow) {
+                        accRow.classList.remove('hidden');
+                        document.getElementById('modalBankAccount').textContent = pm.accountNumber || '-';
+                    }
+                }
+            } else {
+                paymentInfo.classList.add('hidden');
+                contactInfo.classList.remove('hidden');
+
+                const adminContact = deposit.adminContact || '';
+                const telegramUsername = adminContact.replace('@', '');
+                const telegramLink = document.getElementById('telegramLink');
+                telegramLink.href = `https://t.me/${telegramUsername}`;
+
+                const usernameDisplay = adminContact.startsWith('@') ? adminContact : '@' + adminContact;
+                document.getElementById('modalAdminContactUsername').textContent = usernameDisplay;
+                document.getElementById('modalUniqueAmountContact').textContent = formattedAmount;
+            }
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('depositModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.getElementById('uploadForm').reset();
+            document.getElementById('imagePreview').classList.add('hidden');
+            currentDeposit = null;
+        }
+
+        // Handle upload form
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const confirmBtn = document.getElementById('confirmBtn');
+            confirmBtn.disabled = true;
+            confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Processing...';
+
+            const formData = new FormData(e.target);
+
+            // Detect mode: new deposit or existing deposit
+            let endpoint = '/api/deposit/confirm'; // Default: legacy mode for new deposit
+
+            if (currentDeposit && currentDeposit.id) {
+                // Existing deposit mode - use new upload-proof endpoint
+                endpoint = '/api/deposit/upload-proof';
+                formData.append('depositId', currentDeposit.id);
+                // Remove amount & uniqueAmount karena sudah ada di DB
+                formData.delete('amount');
+                formData.delete('uniqueAmount');
+            }
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    showToast(result.message, 'success');
+                    closeModal();
+                    loadDesktopDepositHistory(1);
+                    loadMobileDepositHistory(false);
+                } else {
+                    showToast(result.message || 'Gagal mengupload bukti transfer', 'error');
+                }
+            } catch (error) {
+                console.error('Error confirming deposit:', error);
+                showToast('Terjadi kesalahan. Silakan coba lagi.', 'error');
+            } finally {
+                confirmBtn.disabled = false;
+                confirmBtn.innerHTML = '<i class="fas fa-check-circle mr-2"></i> Konfirmasi Transfer';
+            }
+        });
+
+        let desktopDepositPage = 1;
+        let mobileDepositOffset = 0;
+        const limit = 20;
+        let hasMoreMobileDeposit = true;
+
+        // Load desktop deposit history
+        async function loadDesktopDepositHistory(page = 1) {
+            desktopDepositPage = page;
+            const offset = (page - 1) * limit;
+            try {
+                const response = await fetch(`/api/deposit/history?limit=${limit}&offset=${offset}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const tbody = document.getElementById('depositHistoryDesktop');
+                    const emptyState = document.getElementById('emptyStateDesktop'); // Wait, is emptyStateDesktop defined? No, but let's check.
+                    const paginationContainer = document.getElementById('paginationContainerDesktop');
+
+                    if (tbody) tbody.innerHTML = '';
+
+                    if (result.deposits.length === 0 && page === 1) {
+                        if (tbody) tbody.innerHTML = '<tr><td colspan="5" class="text-center py-4 text-gray-500">Belum ada riwayat deposit</td></tr>';
+                        if (paginationContainer) paginationContainer.classList.add('hidden');
+                    } else {
+                        if (paginationContainer) paginationContainer.classList.remove('hidden');
+
+                        let desktopHTML = '';
+                        result.deposits.forEach(d => {
+                            let statusBadge = '';
+                            let actionButton = '';
+
+                            if (d.status === 'approved') {
+                                statusBadge = '<span class="px-2 py-1 bg-green-100 text-green-700 rounded text-xs font-semibold"><i class="fas fa-check-circle"></i> Approved</span>';
+                            } else if (d.status === 'rejected') {
+                                statusBadge = '<span class="px-2 py-1 bg-red-100 text-red-700 rounded text-xs font-semibold"><i class="fas fa-times-circle"></i> Rejected</span>';
+                            } else if (d.status === 'initiated') {
+                                statusBadge = '<span class="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-semibold"><i class="fas fa-hourglass-start"></i> Belum Upload</span>';
+                            } else {
+                                statusBadge = '<span class="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-semibold"><i class="fas fa-clock"></i> Pending</span>';
+                            }
+
+                            if (d.status === 'initiated') {
+                                actionButton = `
+                                    <div class="flex items-center gap-1.5 justify-end">
+                                        <button onclick="confirmExistingDeposit(${d.id})" class="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition flex items-center gap-1 shadow-sm">
+                                            <i class="fas fa-upload"></i> Konfirmasi
+                                        </button>
+                                        <button onclick="cancelDepositAction(${d.id})" class="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-xs font-bold rounded-lg transition flex items-center gap-1">
+                                            <i class="fas fa-trash-alt"></i> Batalkan
+                                        </button>
+                                    </div>
+                                `;
+                            } else {
+                                actionButton = '<span class="text-xs text-gray-400">-</span>';
+                            }
+
+                            const dateObj = new Date(d.created_at);
+                            const dateStr = dateObj.toLocaleDateString('id-ID');
+                            const timeStr = dateObj.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
+
+                            desktopHTML += `
+                                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                                    <td class="py-3 px-2 text-sm text-gray-600">
+                                        ${dateStr}<br>
+                                        <span class="text-xs text-gray-500">${timeStr}</span>
+                                    </td>
+                                    <td class="py-3 px-2 text-sm font-bold text-gray-800">
+                                        Rp ${parseInt(d.amount).toLocaleString('id-ID')}
+                                    </td>
+                                    <td class="py-3 px-2 text-sm font-bold text-emerald-600">
+                                        Rp ${formatUniqueAmount(d.unique_amount)}
+                                    </td>
+                                    <td class="py-3 px-2 text-sm">
+                                        ${statusBadge}
+                                    </td>
+                                    <td class="py-3 px-2 text-sm text-right">
+                                        ${actionButton}
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                        if (tbody) tbody.innerHTML = desktopHTML;
+                        renderDesktopDepositPagination(result.pagination, page);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading desktop deposit history:', error);
+            }
+        }
+
+        // Render Desktop Deposit Pagination
+        function renderDesktopDepositPagination(pagination, page) {
+            const infoEl = document.getElementById('paginationInfoDesktop');
+            const pagesEl = document.getElementById('paginationPagesDesktop');
+            if (!infoEl || !pagesEl) return;
+
+            const total = pagination.total;
+            const from = total === 0 ? 0 : pagination.offset + 1;
+            const to = Math.min(pagination.offset + limit, total);
+            infoEl.textContent = `Showing ${from} to ${to} of ${total} entries`;
+
+            pagesEl.innerHTML = '';
+            const totalPages = Math.ceil(total / limit);
+            if (totalPages <= 1) return;
+
+            // Previous Button
+            const prevBtn = document.createElement('button');
+            prevBtn.className = `px-3 py-1.5 rounded-lg text-xs font-semibold border ${page > 1 ? 'bg-white hover:bg-gray-50 text-gray-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`;
+            prevBtn.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            if (page > 1) {
+                prevBtn.onclick = () => loadDesktopDepositHistory(page - 1);
+            }
+            pagesEl.appendChild(prevBtn);
+
+            // Page Numbers
+            const startPage = Math.max(1, page - 2);
+            const endPage = Math.min(totalPages, page + 2);
+            for (let i = startPage; i <= endPage; i++) {
+                const pageBtn = document.createElement('button');
+                pageBtn.className = `px-3 py-1.5 rounded-lg text-xs font-semibold border ${i === page ? 'bg-emerald-600 text-white border-emerald-600' : 'bg-white hover:bg-gray-50 text-gray-700'}`;
+                pageBtn.textContent = i;
+                pageBtn.onclick = () => loadDesktopDepositHistory(i);
+                pagesEl.appendChild(pageBtn);
+            }
+
+            // Next Button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = `px-3 py-1.5 rounded-lg text-xs font-semibold border ${page < totalPages ? 'bg-white hover:bg-gray-50 text-gray-700' : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`;
+            nextBtn.innerHTML = '<i class="fas fa-chevron-right"></i>';
+            if (page < totalPages) {
+                nextBtn.onclick = () => loadDesktopDepositHistory(page + 1);
+            }
+            pagesEl.appendChild(nextBtn);
+        }
+
+        // Load mobile deposit history
+        async function loadMobileDepositHistory(append = false) {
+            if (!append) {
+                mobileDepositOffset = 0;
+            }
+            try {
+                const response = await fetch(`/api/deposit/history?limit=${limit}&offset=${mobileDepositOffset}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const mbody = document.getElementById('depositHistoryMobile');
+                    const loadMoreContainer = document.getElementById('loadMoreContainerMobile');
+
+                    if (!append && mbody) mbody.innerHTML = '';
+
+                    if (result.deposits.length === 0 && mobileDepositOffset === 0) {
+                        if (mbody) mbody.innerHTML = '<p class="text-center text-xs text-gray-400 py-4">Belum ada riwayat</p>';
+                        if (loadMoreContainer) loadMoreContainer.classList.add('hidden');
+                    } else {
+                        let mobileHTML = '';
+                        result.deposits.forEach(d => {
+                            let statusText = '';
+                            let statusColor = '';
+                            let actionButtonMobile = '';
+
+                            if (d.status === 'approved') {
+                                statusText = 'Approved';
+                                statusColor = 'text-green-600 bg-green-50';
+                            } else if (d.status === 'rejected') {
+                                statusText = 'Rejected';
+                                statusColor = 'text-red-600 bg-red-50';
+                            } else if (d.status === 'initiated') {
+                                statusText = 'Belum Upload';
+                                statusColor = 'text-blue-600 bg-blue-50';
+                            } else {
+                                statusText = 'Pending';
+                                statusColor = 'text-yellow-600 bg-yellow-50';
+                            }
+
+                            if (d.status === 'initiated') {
+                                actionButtonMobile = `
+                                    <div class="mt-3 pt-3 border-t border-gray-100 flex gap-2">
+                                        <button onclick="confirmExistingDeposit(${d.id})" class="flex-1 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-lg transition">
+                                            <i class="fas fa-upload mr-1"></i> Konfirmasi
+                                        </button>
+                                        <button onclick="cancelDepositAction(${d.id})" class="flex-1 py-2 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold rounded-lg transition">
+                                            <i class="fas fa-trash-alt mr-1"></i> Batal
+                                        </button>
+                                    </div>
+                                `;
+                            }
+
+                            const dateObj = new Date(d.created_at);
+                            const dateStr = dateObj.toLocaleDateString('id-ID');
+                            const timeStr = dateObj.toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit'});
+
+                            mobileHTML += `
+                                <div class="bg-white border border-gray-100 rounded-xl p-4 shadow-[0_2px_8px_rgba(0,0,0,0.02)]">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-[10px] text-gray-400 font-medium">${dateStr} ${timeStr}</span>
+                                        <span class="text-[10px] ${statusColor} px-2 py-0.5 rounded-full font-semibold">${statusText}</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div>
+                                            <p class="text-[10px] text-gray-500 font-medium mb-0.5">Nominal</p>
+                                            <p class="text-sm font-bold text-gray-800">Rp ${parseInt(d.amount).toLocaleString('id-ID')}</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-[10px] text-gray-500 font-medium mb-0.5">Transfer</p>
+                                            <p class="text-sm font-bold text-emerald-600">Rp ${formatUniqueAmount(d.unique_amount)}</p>
+                                        </div>
+                                    </div>
+                                    ${actionButtonMobile}
+                                </div>
+                            `;
+                        });
+                        if (mbody) {
+                            if (append) {
+                                mbody.insertAdjacentHTML('beforeend', mobileHTML);
+                            } else {
+                                mbody.innerHTML = mobileHTML;
+                            }
+                        }
+
+                        hasMoreMobileDeposit = result.pagination.hasMore;
+                        if (loadMoreContainer) {
+                            if (hasMoreMobileDeposit) {
+                                loadMoreContainer.classList.remove('hidden');
+                            } else {
+                                loadMoreContainer.classList.add('hidden');
+                            }
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading mobile deposit history:', error);
+            }
+        }
+
+        // Setup load more button for mobile
+        document.getElementById('loadMoreBtnMobile').addEventListener('click', () => {
+            if (hasMoreMobileDeposit) {
+                mobileDepositOffset += limit;
+                loadMobileDepositHistory(true);
+            }
+        });
+
+        // Initial load
+        loadPaymentMethods();
+        loadDesktopDepositHistory(1);
+        loadMobileDepositHistory(false);
+
+        let depositToCancel = null;
+
+        function closeCancelModal() {
+            document.getElementById('cancelDepositModal').classList.add('hidden');
+            document.getElementById('cancelDepositModal').classList.remove('flex');
+            depositToCancel = null;
+        }
+
+        // Handle deposit cancellation modal
+        function cancelDepositAction(depositId) {
+            depositToCancel = depositId;
+            document.getElementById('cancelDepositModal').classList.remove('hidden');
+            document.getElementById('cancelDepositModal').classList.add('flex');
+        }
+
+        document.getElementById('btnConfirmCancel').addEventListener('click', async () => {
+            if (!depositToCancel) return;
+            
+            const btn = document.getElementById('btnConfirmCancel');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Proses...';
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('/api/deposit/cancel', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ depositId: depositToCancel })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    showToast(result.message, 'success');
+                    closeCancelModal();
+                    loadDesktopDepositHistory(1);
+                    loadMobileDepositHistory(false);
+                } else {
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error cancelling deposit:', error);
+                showToast('Gagal membatalkan deposit', 'error');
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        });
+    </script>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Socket.IO Realtime update for Deposit Page
+        if (typeof io !== 'undefined') {
+            const depositSocket = io();
+            fetch('/api/profile/data')
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success && data.user && data.user.id) {
+                        depositSocket.emit('register-user', data.user.id);
+                    }
+                })
+                .catch(err => console.error('Socket register error:', err));
+
+            depositSocket.on('deposit-approved', (data) => {
+                showToast(data.message || 'Deposit Anda telah diverifikasi otomatis!', 'success');
+                if (typeof closeModal === 'function') closeModal();
+                loadDesktopDepositHistory(1);
+                loadMobileDepositHistory(false);
+            });
+
+            depositSocket.on('balance-updated', () => {
+                loadDesktopDepositHistory(1);
+                loadMobileDepositHistory(false);
+            });
+        }
+    </script>
+    <%- include('partials/pwa-script') %>
+</body>
+</html>

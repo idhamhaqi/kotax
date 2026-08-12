@@ -1,0 +1,151 @@
+<%- include('partials/header', { title: 'Referral System', page: 'referrals' }) %>
+
+<h2 class="text-3xl font-bold text-gray-800 mb-8">Referral System</h2>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <!-- Total Bonuses -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm mb-1">Total Bonuses</p>
+                <h3 class="text-3xl font-bold text-gray-800"><%= stats.total_bonuses %></h3>
+            </div>
+            <div class="bg-emerald-100 p-4 rounded-full">
+                <i class="fas fa-gift text-emerald-600 text-2xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Amount -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm mb-1">Total Amount</p>
+                <h3 class="text-2xl font-bold text-gray-800">Rp <%= parseInt(stats.total_amount || 0).toLocaleString('id-ID') %></h3>
+            </div>
+            <div class="bg-green-100 p-4 rounded-full">
+                <i class="fas fa-money-bill-wave text-green-600 text-2xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fill Order Bonuses -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm mb-1">Fill Order Bonuses</p>
+                <h3 class="text-2xl font-bold text-gray-800">Rp <%= parseInt(stats.fill_order_total || 0).toLocaleString('id-ID') %></h3>
+            </div>
+            <div class="bg-orange-100 p-4 rounded-full">
+                <i class="fas fa-mobile-alt text-orange-600 text-2xl"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Referral Bonuses Table -->
+<div class="bg-white rounded-xl shadow-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">
+        <i class="fas fa-share-alt text-emerald-600 mr-2"></i> Referral Bonuses History
+    </h3>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-gray-200">
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">ID</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Receiver</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">From User</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Bonus Type</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Amount</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Level</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Percentage</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Description</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Created At</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% bonuses.forEach(bonus => { %>
+                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                    <td class="py-3 px-4 text-sm text-gray-600">#<%= bonus.id %></td>
+                    <td class="py-3 px-4 text-sm font-semibold text-gray-700"><%= bonus.receiver_name %></td>
+                    <td class="py-3 px-4 text-sm text-gray-600"><%= bonus.from_name %></td>
+                    <td class="py-3 px-4 text-sm">
+                        <% if (bonus.bonus_type === 'conversion') { %>
+                        <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-semibold">
+                            <i class="fas fa-exchange-alt"></i> Conversion
+                        </span>
+                        <% } else if (bonus.bonus_type === 'fill_order') { %>
+                        <span class="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs font-semibold">
+                            <i class="fas fa-mobile-alt"></i> Fill Order
+                        </span>
+                        <% } else { %>
+                        <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs font-semibold">
+                            <%= bonus.bonus_type %>
+                        </span>
+                        <% } %>
+                    </td>
+                    <td class="py-3 px-4 text-sm">
+                        <span class="font-bold text-green-600">
+                            Rp <%= parseInt(bonus.amount).toLocaleString('id-ID') %>
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-sm">
+                        <span class="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-semibold">
+                            Level <%= bonus.level %>
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-sm text-gray-600">
+                        <span class="font-semibold"><%= parseFloat(bonus.percentage).toFixed(1) %>%</span>
+                    </td>
+                    <td class="py-3 px-4 text-sm text-gray-600">
+                        <%= bonus.description || '-' %>
+                    </td>
+                    <td class="py-3 px-4 text-sm text-gray-600">
+                        <%= new Date(bonus.created_at).toLocaleDateString('id-ID') %>
+                        <br>
+                        <span class="text-xs text-gray-500">
+                            <%= new Date(bonus.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) %>
+                        </span>
+                    </td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="mt-6 flex items-center justify-between border-t border-gray-200 pt-4">
+        <div class="text-sm text-gray-600">
+            Showing <%= ((currentPage - 1) * 50) + 1 %> to <%= Math.min(currentPage * 50, totalRecords) %> of <%= totalRecords %> records
+        </div>
+        <div class="flex gap-2">
+            <% if (currentPage > 1) { %>
+                <a href="?page=<%= currentPage - 1 %>" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-semibold transition">Previous</a>
+            <% } else { %>
+                <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-semibold cursor-not-allowed">Previous</span>
+            <% } %>
+
+            <%
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            for (let i = startPage; i <= endPage; i++) { %>
+                <% if (i === currentPage) { %>
+                    <span class="px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-semibold"><%= i %></span>
+                <% } else { %>
+                    <a href="?page=<%= i %>" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-semibold transition"><%= i %></a>
+                <% } %>
+            <% } %>
+
+            <% if (currentPage < totalPages) { %>
+                <a href="?page=<%= currentPage + 1 %>" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg text-sm font-semibold transition">Next</a>
+            <% } else { %>
+                <span class="px-4 py-2 bg-gray-100 text-gray-400 rounded-lg text-sm font-semibold cursor-not-allowed">Next</span>
+            <% } %>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+<%- include('partials/footer') %>

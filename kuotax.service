@@ -1,0 +1,15 @@
+[Unit]
+Description=Kuotax Bun App
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/var/www/kuotax
+# Ensure this path matches the location where Bun is installed on your VPS
+ExecStart=/root/.bun/bin/bun run server.js
+Restart=always
+RestartSec=3
+Environment=NODE_ENV=production
+
+[Install]
+WantedBy=multi-user.target

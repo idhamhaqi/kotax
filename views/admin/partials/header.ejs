@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - Admin Panel</title>
+    <link rel="icon" type="image/png" href="/images/logoa.png">
+    <link rel="shortcut icon" type="image/png" href="/images/logoa.png">
+    <link rel="apple-touch-icon" href="/images/logoa.png">
+    <link rel="stylesheet" href="/css/style.css?v=6">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .admin-nav a {
+            transition: all 0.3s;
+        }
+        .admin-nav a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        .admin-nav a.active {
+            background: rgba(255,255,255,0.2);
+            border-left: 4px solid white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Socket.IO for Real-time Admin Updates -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const adminSocket = io();
+        adminSocket.on('connect', () => {
+            adminSocket.emit('register-admin');
+        });
+
+        // Global Copy Helper
+        function copyToClipboard(text, label = 'Teks') {
+            if (!text || text === '-') {
+                if (typeof showToast === 'function') showToast('Tidak ada data untuk di-copy', 'error');
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                if (typeof showToast === 'function') showToast(`${label} berhasil di-copy!`, 'success');
+            }).catch(err => {
+                const input = document.createElement('textarea');
+                input.value = text;
+                document.body.appendChild(input);
+                input.select();
+                document.execCommand('copy');
+                document.body.removeChild(input);
+                if (typeof showToast === 'function') showToast(`${label} berhasil di-copy!`, 'success');
+            });
+        }
+    </script>
+
+    <!-- Top Header -->
+    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white py-4 px-4 lg:px-6 shadow-lg sticky top-0 z-30">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <button id="adminMobileMenuBtn" class="lg:hidden text-white p-2 rounded-lg hover:bg-white/10 text-xl focus:outline-none">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <img src="/images/logoa.png" alt="Kuota Aggregator" class="h-10 lg:h-12 w-auto">
+                <h1 class="text-lg lg:text-xl font-bold">Admin Panel</h1>
+            </div>
+            <div class="flex items-center gap-3 lg:gap-4">
+                <span class="text-xs lg:text-sm">
+                    <i class="fas fa-user-circle"></i> Administrator
+                </span>
+                <a href="/admin/logout" class="bg-red-500 hover:bg-red-600 px-3 lg:px-4 py-1.5 lg:py-2 rounded-lg text-xs lg:text-sm font-semibold transition">
+                    <i class="fas fa-sign-out-alt"></i> <span class="hidden sm:inline">Logout</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backdrop for mobile drawer -->
+    <div id="adminMobileBackdrop" class="fixed inset-0 bg-black/50 z-40 hidden lg:hidden transition-opacity"></div>
+
+    <div class="flex min-h-[calc(100vh-64px)]">
+        <!-- Sidebar Navigation -->
+        <div id="adminSidebar" class="fixed lg:static top-0 left-0 h-full lg:h-auto z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 w-64 bg-gradient-to-b from-gray-800 to-gray-900 text-white admin-nav shrink-0">
+            <div class="p-4 lg:hidden flex justify-between items-center border-b border-gray-700">
+                <span class="font-bold text-sm text-gray-300">MENU ADMIN</span>
+                <button id="adminCloseMenuBtn" class="text-gray-400 hover:text-white p-1">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <nav class="p-4">
+                <a href="/admin" class="block px-4 py-3 rounded-lg mb-2 <%= page === 'dashboard' ? 'active' : '' %>">
+                    <i class="fas fa-tachometer-alt mr-3"></i> Dashboard
+                </a>
+                <a href="/admin/users" class="block px-4 py-3 rounded-lg mb-2 <%= page === 'users' ? 'active' : '' %>">
+                    <i class="fas fa-users mr-3"></i> Users Management
+                </a>
+                <a href="/admin/deposits" class="block px-4 py-3 rounded-lg mb-2 <%= page === 'deposits' ? 'active' : '' %>">
+                    <i class="fas fa-money-bill-wave mr-3"></i> Deposits
+                </a>
+                <a href="/admin/withdrawals" class="block px-4 py-3 rounded-lg mb-2 <%= page === 'withdrawals' ? 'active' : '' %>">
+                    <i class="fas fa-money-check mr-3"></i> Withdrawals
+                </a>
+                <a href="/admin/transactions" class="block px-4 py-3 rounded-lg mb-2 <%= page === 'transactions' ? 'active' : '' %>">
+                    <i class="fas fa-exchange-alt mr-3"></i> Transactions
+                </a>
+                <a href="/admin/referrals" class="block px-4 py-3 rounded-lg mb-2 <%= page === 'referrals' ? 'active' : '' %>">
+                    <i class="fas fa-share-alt mr-3"></i> Referral System
+                </a>
+                <a href="/admin/tickets" class="flex items-center justify-between px-4 py-3 rounded-lg mb-2 <%= page === 'tickets' ? 'active' : '' %>">
+                    <div>
+                        <i class="fas fa-headset mr-3"></i> Support Tiket
+                    </div>
+                    <span id="adminSidebarTicketBadge" class="hidden px-2 py-0.5 bg-red-500 text-white rounded-full text-[11px] font-bold">0</span>
+                </a>
+                <a href="/admin/payment-methods" class="block px-4 py-3 rounded-lg mb-2 <%= page === 'payment-methods' ? 'active' : '' %>">
+                    <i class="fas fa-credit-card mr-3"></i> Metode Pembayaran
+                </a>
+                <a href="/admin/webhook" class="block px-4 py-3 rounded-lg mb-2 <%= page === 'webhook' ? 'active' : '' %>">
+                    <i class="fas fa-satellite-dish mr-3"></i> Webhook Monitor
+                </a>
+                <a href="/admin/settings" class="block px-4 py-3 rounded-lg mb-2 <%= page === 'settings' ? 'active' : '' %>">
+                    <i class="fas fa-cog mr-3"></i> Settings
+                </a>
+            </nav>
+        </div>
+
+        <script>
+            // Fetch unhandled ticket count for admin sidebar badge
+            async function updateAdminSidebarTicketBadge() {
+                try {
+                    const res = await fetch('/api/admin/support/tickets?status=open');
+                    const data = await res.json();
+                    if (data.success) {
+                        const badge = document.getElementById('adminSidebarTicketBadge');
+                        if (badge) {
+                            if (data.openCount > 0) {
+                                badge.textContent = data.openCount;
+                                badge.classList.remove('hidden');
+                            } else {
+                                badge.classList.add('hidden');
+                            }
+                        }
+                    }
+                } catch (e) { console.error('Badge update error:', e); }
+            }
+
+            if (typeof adminSocket !== 'undefined') {
+                adminSocket.on('admin-new-ticket', (data) => {
+                    updateAdminSidebarTicketBadge();
+                    if (typeof showToast === 'function') {
+                        showToast(`🎟️ Tiket Bantuan Baru (${data.ticketCode}) dari ${data.userName}`, 'info');
+                    }
+                });
+                adminSocket.on('admin-ticket-updated', () => {
+                    updateAdminSidebarTicketBadge();
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', () => {
+                updateAdminSidebarTicketBadge();
+            });
+        </script>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const menuBtn = document.getElementById('adminMobileMenuBtn');
+                const closeBtn = document.getElementById('adminCloseMenuBtn');
+                const sidebar = document.getElementById('adminSidebar');
+                const backdrop = document.getElementById('adminMobileBackdrop');
+
+                function openMenu() {
+                    if (sidebar) sidebar.classList.remove('-translate-x-full');
+                    if (backdrop) backdrop.classList.remove('hidden');
+                }
+
+                function closeMenu() {
+                    if (sidebar) sidebar.classList.add('-translate-x-full');
+                    if (backdrop) backdrop.classList.add('hidden');
+                }
+
+                if (menuBtn) menuBtn.addEventListener('click', openMenu);
+                if (closeBtn) closeBtn.addEventListener('click', closeMenu);
+                if (backdrop) backdrop.addEventListener('click', closeMenu);
+            });
+        </script>
+
+        <!-- Main Content -->
+        <div class="flex-1 p-4 lg:p-8 overflow-x-hidden">

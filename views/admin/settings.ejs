@@ -1,0 +1,425 @@
+<%- include('partials/header', { title: 'System Settings', page: 'settings' }) %>
+
+<div class="mb-8 flex items-center justify-between">
+    <div>
+        <h2 class="text-2xl font-extrabold text-gray-900 tracking-tight">System Settings</h2>
+        <p class="text-xs text-gray-500 mt-1">Kelola kontrol performa order volume dan target profit bulanan platform.</p>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Order Multiplier Settings -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg font-bold">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-gray-900">Order Volume Control</h3>
+                <p class="text-xs text-gray-500">Atur intensitas simulasi order real-time</p>
+            </div>
+        </div>
+
+        <form id="multiplierForm" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-2">
+                    Order Multiplier
+                </label>
+                <select name="order_multiplier"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-semibold text-sm">
+                    <option value="1" <%= settings.order_multiplier == '1' ? 'selected' : '' %>>1x - Normal (Default)</option>
+                    <option value="2" <%= settings.order_multiplier == '2' ? 'selected' : '' %>>2x - Lebih Banyak</option>
+                    <option value="3" <%= settings.order_multiplier == '3' ? 'selected' : '' %>>3x - Sangat Banyak</option>
+                    <option value="4" <%= settings.order_multiplier == '4' ? 'selected' : '' %>>4x - Ramai Sekali</option>
+                </select>
+                <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                    <i class="fas fa-info-circle text-emerald-600"></i> Kontrol jumlah order yang muncul. Perubahan berlaku otomatis dalam 5 menit.
+                </p>
+            </div>
+
+            <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3.5">
+                <p class="text-xs text-emerald-800 leading-relaxed">
+                    <i class="fas fa-lightbulb mr-1"></i> <strong>Contoh:</strong> Jika normal muncul 8 orders/cycle, opsi 2x akan memicu 16 orders, 3x = 24 orders, dst.
+                </p>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-md">
+                <i class="fas fa-save mr-2"></i> Simpan Order Multiplier
+            </button>
+        </form>
+    </div>
+
+    <!-- Target Monthly ROI Settings -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg font-bold">
+                <i class="fas fa-bullseye"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-gray-900">Target Profit Bulanan</h3>
+                <p class="text-xs text-gray-500">Atur rata-rata estimasi ROI pengguna</p>
+            </div>
+        </div>
+
+        <form id="profitMultiplierForm" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-2">
+                    Target ROI (Bulanan)
+                </label>
+                <select name="target_monthly_roi"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-semibold text-sm">
+                    <option value="15" <%= settings.target_monthly_roi == '15' ? 'selected' : '' %>>15% / Bulan (Low Risk)</option>
+                    <option value="20" <%= settings.target_monthly_roi == '20' ? 'selected' : '' %>>20% / Bulan (Normal)</option>
+                    <option value="25" <%= settings.target_monthly_roi == '25' ? 'selected' : '' %>>25% / Bulan (Menengah)</option>
+                    <option value="30" <%= (settings.target_monthly_roi == '30' || !settings.target_monthly_roi) ? 'selected' : '' %>>30% / Bulan (Rekomendasi)</option>
+                    <option value="40" <%= settings.target_monthly_roi == '40' ? 'selected' : '' %>>40% / Bulan (Agresif)</option>
+                    <option value="50" <%= settings.target_monthly_roi == '50' ? 'selected' : '' %>>50% / Bulan (Promo High-Risk)</option>
+                </select>
+                <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                    <i class="fas fa-info-circle text-purple-600"></i> Rata-rata margin per transaksi harian diatur otomatis (misal: 30% / bulan = ~1% / hari).
+                </p>
+            </div>
+
+            <div class="bg-purple-50 border border-purple-200 rounded-xl p-3.5">
+                <p class="text-xs text-purple-800 leading-relaxed">
+                    <i class="fas fa-lightbulb mr-1"></i> <strong>Sistem Pintar:</strong> Margin akan diacak alami (misal 0.9% - 1.1%) agar tidak statis, namun rata-rata tetap stabil di target.
+                </p>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-md">
+                <i class="fas fa-save mr-2"></i> Simpan Target Profit
+            </button>
+        </form>
+    </div>
+
+    <!-- Google Analytics & Header Tracking Script -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:col-span-2">
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center text-lg font-bold">
+                <i class="fas fa-code"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-gray-900">Google Analytics & Public Tracking Script</h3>
+                <p class="text-xs text-gray-500">Inject script tracking otomatis di seluruh halaman publik & user dashboard</p>
+            </div>
+        </div>
+
+        <form id="gaScriptForm" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-2">
+                    HTML / JavaScript Tag (Contoh: Google Tag Manager, GA4, Meta Pixel)
+                </label>
+                <textarea name="google_analytics_script" rows="6"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-xs text-gray-800 bg-gray-50/50"
+                    placeholder="<!-- Global site tag (gtag.js) - Google Analytics -->&#10;<script async src='https://www.googletagmanager.com/gtag/js?id=G-XXXXXXX'></script>&#10;<script>&#10;  window.dataLayer = window.dataLayer || [];&#10;  function gtag(){dataLayer.push(arguments);}&#10;  gtag('js', new Date());&#10;  gtag('config', 'G-XXXXXXX');&#10;</script>"><%= settings.google_analytics_script || '' %></textarea>
+                <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                    <i class="fas fa-shield-alt text-emerald-600"></i> Script ini <strong>HANYA</strong> akan di-load pada halaman pengguna/publik. Halaman Admin Panel aman & <strong>TIDAK KETRACKING</strong>.
+                </p>
+            </div>
+
+            <button type="submit"
+                class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-md flex items-center gap-2">
+                <i class="fas fa-save"></i> Simpan Analytics Script
+            </button>
+        </form>
+    </div>
+
+    <!-- Email Template Logo Configuration -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:col-span-2">
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+            <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-lg font-bold">
+                <i class="fas fa-envelope-open-text"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-gray-900">Konfigurasi Logo Template Email</h3>
+                <p class="text-xs text-gray-500">Atur URL gambar logo resmi yang tampil di header seluruh notifikasi email</p>
+            </div>
+        </div>
+
+        <form id="emailLogoForm" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-2">
+                    URL Gambar Logo Email (Media / Brevo Content Library)
+                </label>
+                <%
+                    const defaultLogoUrl = 'https://img.mailinblue.com/11838366/images/content_library/original/6a7adc9224e51a588957dcd8.png';
+                    const activeEmailLogo = settings.email_logo_url || defaultLogoUrl;
+                %>
+                <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
+                    <input type="url" id="emailLogoInput" name="email_logo_url" value="<%= activeEmailLogo %>" required
+                        class="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono text-xs text-gray-800"
+                        placeholder="https://img.mailinblue.com/...">
+                    <button type="submit"
+                        class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-md flex items-center gap-2 whitespace-nowrap">
+                        <i class="fas fa-save"></i> Simpan Logo Email
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                    <i class="fas fa-info-circle text-emerald-600"></i> Disarankan menggunakan gambar dengan rasio horizontal & background transparan / putih.
+                </p>
+            </div>
+
+            <!-- Logo Live Preview Box -->
+            <div class="bg-gradient-to-r from-emerald-800 to-green-900 p-4 rounded-xl text-center border border-emerald-700 shadow-inner">
+                <p class="text-[10px] font-bold text-emerald-200 uppercase tracking-wider mb-2">Live Preview Header Email</p>
+                <div class="inline-block p-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
+                    <img id="emailLogoPreview" src="<%= activeEmailLogo %>" alt="Email Logo Preview" class="max-h-12 max-w-[200px] object-contain mx-auto">
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Test Email Sender Feature -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:col-span-2">
+        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+            <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center text-lg font-bold">
+                <i class="fas fa-vial"></i>
+            </div>
+            <div>
+                <h3 class="text-base font-bold text-gray-900">Fitur Uji Coba Email (Send Test Email)</h3>
+                <p class="text-xs text-gray-500">Kirim email simulasi ke inbox Anda untuk menguji desain format & pengiriman Brevo API</p>
+            </div>
+        </div>
+
+        <form id="testEmailForm" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-2">
+                        Alamat Email Tujuan Test
+                    </label>
+                    <input type="email" name="to_email" required placeholder="Contoh: namaanda@gmail.com"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-semibold text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-700 uppercase mb-2">
+                        Pilih Template Notifikasi Email
+                    </label>
+                    <select name="template_type" class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-semibold text-sm">
+                        <optgroup label="Verifikasi & Akun">
+                            <option value="otp">🔐 Kode OTP Verifikasi Akun</option>
+                            <option value="reset_password">🔑 Link Reset Password</option>
+                        </optgroup>
+                        <optgroup label="Transaksi Deposit">
+                            <option value="deposit_pending">⏳ Deposit Status: Diproses (Pending)</option>
+                            <option value="deposit_approved">✅ Deposit Status: Disetujui (Approved)</option>
+                            <option value="deposit_rejected">❌ Deposit Status: Ditolak (Rejected)</option>
+                        </optgroup>
+                        <optgroup label="Penarikan Saldo (Withdrawal)">
+                            <option value="withdrawal_pending">⏳ Penarikan Status: Diproses (Pending)</option>
+                            <option value="withdrawal_approved">✅ Penarikan Status: Berhasil Ditransfer</option>
+                            <option value="withdrawal_rejected">❌ Penarikan Status: Ditolak (Rejected)</option>
+                        </optgroup>
+                        <optgroup label="Support System">
+                            <option value="support_ticket">📩 Tiket Bantuan (Balasan Support Admin)</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-purple-50 border border-purple-200 rounded-xl p-3.5 flex items-start gap-2.5">
+                <i class="fas fa-paper-plane text-purple-600 text-sm mt-0.5"></i>
+                <p class="text-xs text-purple-900 leading-relaxed">
+                    <strong>Informasi:</strong> Email uji coba akan dikirim secara nyata (*live*) menggunakan layanan SMTP Brevo API yang sudah terkonfigurasi pada file `.env`.
+                </p>
+            </div>
+
+            <button type="submit" id="sendTestBtn"
+                class="bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-6 rounded-xl transition shadow-md flex items-center gap-2">
+                <i class="fas fa-paper-plane"></i> Kirim Email Uji Coba Sekarang
+            </button>
+        </form>
+    </div>
+</div>
+
+<!-- Status Cards -->
+<div class="mt-8 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+    <h3 class="text-base font-bold text-gray-900 mb-4 flex items-center gap-2">
+        <i class="fas fa-info-circle text-emerald-600"></i> Status Konfigurasi Aktif
+    </h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+            <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-chart-line text-emerald-600 text-lg"></i>
+                <span class="font-bold text-gray-900 text-sm">Order Multiplier Active</span>
+            </div>
+            <p class="text-xs text-gray-600 mt-1">
+                <%
+                const multiplier = settings.order_multiplier || '1';
+                const multiplierLabels = {
+                    '1': '1x - Normal (Default)',
+                    '2': '2x - Lebih Banyak',
+                    '3': '3x - Sangat Banyak',
+                    '4': '4x - Ramai Sekali'
+                };
+                %>
+                Current Mode: <strong class="text-emerald-700"><%= multiplierLabels[multiplier] || '1x - Normal' %></strong>
+            </p>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4 border border-gray-200">
+            <div class="flex items-center gap-2 mb-1">
+                <i class="fas fa-bullseye text-purple-600 text-lg"></i>
+                <span class="font-bold text-gray-900 text-sm">Target Profit Active</span>
+            </div>
+            <p class="text-xs text-gray-600 mt-1">
+                <%
+                const targetRoi = settings.target_monthly_roi || '30';
+                %>
+                Current Target: <strong class="text-purple-700"><%= targetRoi %>% / Bulan</strong>
+            </p>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+<script src="/js/toast.js?v=<%= Date.now() %>"></script>
+
+<script>
+// Live logo preview listener
+document.getElementById('emailLogoInput').addEventListener('input', function(e) {
+    const val = e.target.value.trim();
+    if (val) {
+        document.getElementById('emailLogoPreview').src = val;
+    }
+});
+
+// Handle Email Logo Form
+document.getElementById('emailLogoForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = {
+        email_logo_url: formData.get('email_logo_url')
+    };
+    try {
+        const response = await fetch('/api/admin/settings/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (result.success) {
+            showToast('Logo Template Email berhasil diperbarui!', 'success');
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (error) {
+        showToast('Gagal menyimpan logo email', 'error');
+    }
+});
+
+// Handle Test Email Form
+document.getElementById('testEmailForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('sendTestBtn');
+    const origHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin mr-1"></i> Mengirim Test Email...';
+
+    const formData = new FormData(e.target);
+    const data = {
+        to_email: formData.get('to_email'),
+        template_type: formData.get('template_type')
+    };
+
+    try {
+        const response = await fetch('/api/admin/settings/test-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            showToast(result.message, 'success');
+        } else {
+            showToast(result.message || 'Gagal mengirim email uji coba', 'error');
+        }
+    } catch (error) {
+        showToast('Terjadi kesalahan koneksi server', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = origHtml;
+    }
+});
+
+// Handle Multiplier Form
+document.getElementById('multiplierForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = {
+        order_multiplier: formData.get('order_multiplier'),
+        target_monthly_roi: document.querySelector('select[name="target_monthly_roi"]').value
+    };
+    try {
+        const response = await fetch('/api/admin/settings/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (result.success) {
+            const multiplier = formData.get('order_multiplier');
+            showToast(`Order multiplier disetel ke ${multiplier}x.`, 'success');
+            setTimeout(() => location.reload(), 1200);
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (error) {
+        showToast('Gagal menyimpan multiplier', 'error');
+    }
+});
+
+// Handle Profit Multiplier Form
+document.getElementById('profitMultiplierForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = {
+        order_multiplier: document.querySelector('select[name="order_multiplier"]').value,
+        target_monthly_roi: formData.get('target_monthly_roi')
+    };
+    try {
+        const response = await fetch('/api/admin/settings/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (result.success) {
+            const target = formData.get('target_monthly_roi');
+            showToast(`Target Profit Bulanan disetel ke ${target}%.`, 'success');
+            setTimeout(() => location.reload(), 1200);
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (error) {
+        showToast('Gagal menyimpan target profit', 'error');
+    }
+});
+
+// Handle GA Script Form
+document.getElementById('gaScriptForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const data = {
+        google_analytics_script: formData.get('google_analytics_script')
+    };
+    try {
+        const response = await fetch('/api/admin/settings/update', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        if (result.success) {
+            showToast('Script Google Analytics berhasil disimpan & diaktifkan di halaman publik!', 'success');
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (error) {
+        showToast('Gagal menyimpan analytics script', 'error');
+    }
+});
+</script>
+
+<%- include('partials/footer') %>

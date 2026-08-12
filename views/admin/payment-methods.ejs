@@ -1,0 +1,373 @@
+<%- include('partials/header', { title: 'Metode Pembayaran', page: 'payment-methods' }) %>
+
+<div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+    <div>
+        <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Manajemen Metode Pembayaran</h2>
+        <p class="text-sm text-gray-600">Kelola bank, e-wallet, dan QRIS untuk jalur deposit pengguna</p>
+    </div>
+    <button onclick="openAddModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-5 py-2.5 rounded-xl shadow-lg transition flex items-center gap-2 self-start sm:self-auto">
+        <i class="fas fa-plus"></i> Tambah Metode Pembayaran
+    </button>
+</div>
+
+<!-- Payment Methods Table -->
+<div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+    <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b border-gray-100 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                    <th class="py-4 px-6">Metode</th>
+                    <th class="py-4 px-6">Kategori</th>
+                    <th class="py-4 px-6">No. Rekening / QR Code</th>
+                    <th class="py-4 px-6">Atas Nama</th>
+                    <th class="py-4 px-6">Min. Deposit</th>
+                    <th class="py-4 px-6 text-center">Status</th>
+                    <th class="py-4 px-6 text-right">Aksi</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-sm font-medium text-gray-700">
+                <% if (methods && methods.length > 0) { %>
+                    <% methods.forEach(m => { %>
+                        <tr class="hover:bg-gray-50/80 transition">
+                            <td class="py-4 px-6 flex items-center gap-3">
+                                <% if (m.logo_url) { %>
+                                    <img src="<%= m.logo_url %>" alt="<%= m.name %>" class="w-10 h-10 object-contain rounded-lg border border-gray-100 p-1 bg-white">
+                                <% } else { %>
+                                    <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-sm">
+                                        <%= m.name.substring(0, 2).toUpperCase() %>
+                                    </div>
+                                <% } %>
+                                <div>
+                                    <span class="font-bold text-gray-900 block"><%= m.name %></span>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6">
+                                <span class="px-3 py-1 rounded-full text-xs font-bold <%= m.category === 'QRIS' ? 'bg-purple-100 text-purple-700' : (m.category === 'E-Wallet' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700') %>">
+                                    <%= m.category %>
+                                </span>
+                            </td>
+                            <td class="py-4 px-6">
+                                <% if (m.category === 'QRIS' && m.qr_code_url) { %>
+                                    <div class="flex items-center gap-2">
+                                        <a href="<%= m.qr_code_url %>" target="_blank" class="inline-block border border-gray-200 p-1 rounded bg-white hover:border-purple-500 transition">
+                                            <img src="<%= m.qr_code_url %>" alt="QRIS QR" class="w-8 h-8 object-contain">
+                                        </a>
+                                        <span class="text-xs font-semibold text-purple-700">Gambar QRIS Available</span>
+                                    </div>
+                                <% } else { %>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-mono font-bold text-gray-800"><%= m.account_number %></span>
+                                        <button onclick="copyToClipboard('<%= m.account_number %>', 'No. Rekening')" class="text-gray-400 hover:text-gray-600">
+                                            <i class="fas fa-copy text-xs"></i>
+                                        </button>
+                                    </div>
+                                <% } %>
+                            </td>
+                            <td class="py-4 px-6 text-gray-800 font-semibold"><%= m.account_holder %></td>
+                            <td class="py-4 px-6 font-bold text-emerald-600">Rp <%= parseInt(m.min_deposit || 100000).toLocaleString('id-ID') %></td>
+                            <td class="py-4 px-6 text-center">
+                                <button id="status-btn-<%= m.id %>" onclick="toggleStatus(<%= m.id %>, <%= !m.is_active %>, this)" class="px-3 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 mx-auto <%= m.is_active ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-gray-100 text-gray-500 hover:bg-gray-200' %>">
+                                    <span class="w-2 h-2 rounded-full <%= m.is_active ? 'bg-emerald-500' : 'bg-gray-400' %>"></span>
+                                    <%= m.is_active ? 'Aktif' : 'Nonaktif' %>
+                                </button>
+                            </td>
+                            <td class="py-4 px-6 text-right space-x-2">
+                                <button onclick='openEditModal(<%- JSON.stringify(m) %>)' class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="deleteMethod(<%= m.id %>, '<%= m.name %>')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Hapus">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="7" class="py-12 text-center text-gray-400">
+                            <i class="fas fa-credit-card text-4xl mb-3 text-gray-300"></i>
+                            <p>Belum ada metode pembayaran. Klik tombol "Tambah Metode Pembayaran".</p>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Form (Add / Edit) -->
+<div id="methodModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-lg w-full shadow-2xl relative max-h-[90vh] overflow-y-auto">
+        <button onclick="closeModal()" class="absolute top-5 right-5 text-gray-400 hover:text-gray-600 text-xl font-bold">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <h3 id="modalTitle" class="text-xl font-bold text-gray-800 mb-6">Tambah Metode Pembayaran</h3>
+
+        <form id="methodForm" enctype="multipart/form-data" class="space-y-4">
+            <input type="hidden" id="methodId" name="id">
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Kategori Metode</label>
+                <select id="methodCategory" name="category" onchange="onCategoryChange(this.value)" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm font-semibold">
+                    <option value="Bank Transfer">Bank Transfer</option>
+                    <option value="E-Wallet">E-Wallet</option>
+                    <option value="QRIS">QRIS (Scan QR Code)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nama Metode / Bank</label>
+                <input type="text" id="methodName" name="name" required placeholder="Contoh: SeaBank, DANA, BCA, QRIS All Payment"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm font-semibold">
+            </div>
+
+            <div id="accountNumberGroup">
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">No. Rekening / No. HP</label>
+                <input type="text" id="methodAccountNumber" name="account_number" placeholder="Contoh: 901062002267 / 081234567890"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm font-semibold">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Atas Nama Pemilik Rekening</label>
+                <input type="text" id="methodAccountHolder" name="account_holder" required placeholder="Contoh: MUHAMMAD IDHAM / KUOTAX OFFICIAL"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm font-semibold">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Minimal Deposit (Rp)</label>
+                <input type="number" id="methodMinDeposit" name="min_deposit" value="100000" min="10000" step="5000" required
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm font-semibold">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Logo Metode Pembayaran (Opsional)</label>
+                <input type="file" id="methodLogo" name="logo" accept="image/*"
+                    class="w-full text-xs text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100">
+                <div id="currentLogoPreview" class="hidden items-center gap-3 mt-2 p-2 bg-gray-50 rounded-xl border border-gray-200">
+                    <img id="currentLogoImg" src="" class="w-8 h-8 object-contain rounded bg-white p-1 border">
+                    <span class="text-xs text-gray-600 font-medium">Logo saat ini</span>
+                    <label class="ml-auto text-xs text-red-600 font-bold flex items-center gap-1 cursor-pointer">
+                        <input type="checkbox" id="deleteLogoCheck" name="delete_logo" value="true"> Hapus Logo
+                    </label>
+                </div>
+            </div>
+
+            <div id="rawQrisGroup" class="hidden">
+                <label class="block text-xs font-bold text-purple-700 uppercase mb-1">
+                    <i class="fas fa-qrcode mr-1"></i> Payload Raw String QRIS (Diawali 000201...)
+                </label>
+                <textarea id="methodRawQris" name="raw_qris" rows="3" placeholder="Contoh: 00020101021126600016ID.CO.QRIS.WWW..."
+                    class="w-full px-3 py-2 rounded-xl border border-purple-200 focus:ring-2 focus:ring-purple-500 focus:outline-none text-xs font-mono"></textarea>
+                <p class="text-[11px] text-gray-500 mt-1">Sistem akan menyuntikkan nominal unik transaksi secara otomatis ke QRIS ini saat user deposit.</p>
+            </div>
+
+            <div id="qrCodeGroup" class="hidden">
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">
+                    <i class="fas fa-image mr-1"></i> Gambar Logo QRIS (Opsional)
+                </label>
+                <input type="file" id="methodQrCode" name="qr_code" accept="image/*"
+                    class="w-full text-xs text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100">
+                <div id="currentQrPreview" class="hidden items-center gap-3 mt-2 p-2 bg-purple-50 rounded-xl border border-purple-200">
+                    <img id="currentQrImg" src="" class="w-8 h-8 object-contain rounded bg-white p-1 border">
+                    <span class="text-xs text-purple-700 font-medium">Gambar QRIS saat ini</span>
+                    <label class="ml-auto text-xs text-red-600 font-bold flex items-center gap-1 cursor-pointer">
+                        <input type="checkbox" id="deleteQrCheck" name="delete_qr_code" value="true"> Hapus Gambar QRIS
+                    </label>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Status Aktif</label>
+                <select id="methodIsActive" name="is_active" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-emerald-500 focus:outline-none text-sm font-semibold">
+                    <option value="true">Aktif (Bisa Dipilih User)</option>
+                    <option value="false">Nonaktif (Dalam Maintenance)</option>
+                </select>
+            </div>
+
+            <div class="pt-4 flex gap-3">
+                <button type="button" onclick="closeModal()" class="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 font-bold hover:bg-gray-50 transition">
+                    Batal
+                </button>
+                <button type="submit" id="saveMethodBtn" class="flex-1 py-3 rounded-xl bg-emerald-600 text-white font-bold hover:bg-emerald-700 transition shadow-lg">
+                    Simpan
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+<script src="/js/toast.js?v=<%= Date.now() %>"></script>
+
+<script>
+function onCategoryChange(category) {
+    const qrGroup = document.getElementById('qrCodeGroup');
+    const rawQrisGroup = document.getElementById('rawQrisGroup');
+    const accGroup = document.getElementById('accountNumberGroup');
+    const accInput = document.getElementById('methodAccountNumber');
+    const accHolderInput = document.getElementById('methodAccountHolder');
+    const nameInput = document.getElementById('methodName');
+    
+    if (category === 'QRIS') {
+        qrGroup.classList.remove('hidden');
+        rawQrisGroup.classList.remove('hidden');
+        if (accInput && (!accInput.value || accInput.value === '-')) accInput.value = 'QRIS All Payment';
+        if (accHolderInput && !accHolderInput.value) accHolderInput.value = 'QRIS Merchant';
+        if (nameInput && !nameInput.value) nameInput.value = 'QRIS Dinamis';
+    } else {
+        qrGroup.classList.add('hidden');
+        rawQrisGroup.classList.add('hidden');
+        if (accInput && accInput.value === 'QRIS All Payment') accInput.value = '';
+    }
+}
+
+function openAddModal() {
+    document.getElementById('methodId').value = '';
+    document.getElementById('methodForm').reset();
+    document.getElementById('modalTitle').textContent = 'Tambah Metode Pembayaran';
+    
+    document.getElementById('currentLogoPreview').classList.add('hidden');
+    document.getElementById('currentLogoPreview').classList.remove('flex');
+    document.getElementById('currentQrPreview').classList.add('hidden');
+    document.getElementById('currentQrPreview').classList.remove('flex');
+
+    onCategoryChange(document.getElementById('methodCategory').value);
+    
+    const modal = document.getElementById('methodModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function openEditModal(m) {
+    document.getElementById('methodId').value = m.id;
+    document.getElementById('methodName').value = m.name;
+    document.getElementById('methodCategory').value = m.category || 'Bank Transfer';
+    document.getElementById('methodAccountNumber').value = m.account_number || '';
+    document.getElementById('methodAccountHolder').value = m.account_holder || '';
+    document.getElementById('methodRawQris').value = m.raw_qris || '';
+    document.getElementById('methodMinDeposit').value = m.min_deposit || 10000;
+    document.getElementById('methodIsActive').value = m.is_active ? 'true' : 'false';
+    document.getElementById('modalTitle').textContent = 'Edit Metode Pembayaran';
+
+    if (document.getElementById('deleteLogoCheck')) document.getElementById('deleteLogoCheck').checked = false;
+    if (document.getElementById('deleteQrCheck')) document.getElementById('deleteQrCheck').checked = false;
+
+    if (m.logo_url) {
+        document.getElementById('currentLogoImg').src = m.logo_url;
+        document.getElementById('currentLogoPreview').classList.remove('hidden');
+        document.getElementById('currentLogoPreview').classList.add('flex');
+    } else {
+        document.getElementById('currentLogoPreview').classList.add('hidden');
+        document.getElementById('currentLogoPreview').classList.remove('flex');
+    }
+
+    if (m.qr_code_url) {
+        document.getElementById('currentQrImg').src = m.qr_code_url;
+        document.getElementById('currentQrPreview').classList.remove('hidden');
+        document.getElementById('currentQrPreview').classList.add('flex');
+    } else {
+        document.getElementById('currentQrPreview').classList.add('hidden');
+        document.getElementById('currentQrPreview').classList.remove('flex');
+    }
+
+    onCategoryChange(m.category);
+
+    const modal = document.getElementById('methodModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+}
+
+function closeModal() {
+    const modal = document.getElementById('methodModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+document.getElementById('methodForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const btn = document.getElementById('saveMethodBtn');
+    const origText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+    const methodId = document.getElementById('methodId').value;
+    const isEdit = Boolean(methodId);
+    const endpoint = isEdit ? '/api/admin/payment-methods/update' : '/api/admin/payment-methods/create';
+
+    const formData = new FormData(document.getElementById('methodForm'));
+
+    try {
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            showToast(result.message, 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(result.message, 'error');
+            btn.disabled = false;
+            btn.innerHTML = origText;
+        }
+    } catch (err) {
+        showToast('Terjadi kesalahan server', 'error');
+        btn.disabled = false;
+        btn.innerHTML = origText;
+    }
+});
+
+async function toggleStatus(id, isActive, btnEl) {
+    try {
+        const response = await fetch('/api/admin/payment-methods/toggle-status', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id, isActive })
+        });
+        const result = await response.json();
+        if (result.success) {
+            showToast(result.message, 'success');
+            const targetBtn = btnEl || document.getElementById(`status-btn-${id}`);
+            if (targetBtn) {
+                const nextActive = !isActive;
+                targetBtn.setAttribute('onclick', `toggleStatus(${id}, ${nextActive}, this)`);
+                if (isActive) {
+                    targetBtn.className = 'px-3 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 mx-auto bg-emerald-100 text-emerald-700 hover:bg-emerald-200';
+                    targetBtn.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Aktif';
+                } else {
+                    targetBtn.className = 'px-3 py-1.5 rounded-full text-xs font-bold transition flex items-center gap-1.5 mx-auto bg-gray-100 text-gray-500 hover:bg-gray-200';
+                    targetBtn.innerHTML = '<span class="w-2 h-2 rounded-full bg-gray-400"></span> Nonaktif';
+                }
+            }
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (err) {
+        showToast('Gagal mengubah status', 'error');
+    }
+}
+
+async function deleteMethod(id, name) {
+    if (!confirm(`Apakah Anda yakin ingin menghapus metode pembayaran "${name}"?`)) return;
+
+    try {
+        const response = await fetch('/api/admin/payment-methods/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+        });
+        const result = await response.json();
+        if (result.success) {
+            showToast(result.message, 'success');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            showToast(result.message, 'error');
+        }
+    } catch (err) {
+        showToast('Gagal menghapus metode', 'error');
+    }
+}
+</script>
+
+<%- include('partials/footer') %>

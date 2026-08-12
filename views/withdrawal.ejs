@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Penarikan - KUOTAX</title>
+    <%- include('partials/pwa-head') %>
+    <link rel="stylesheet" href="/css/style.css?v=6">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-emerald-50 via-green-50 to-teal-50 min-h-screen">
+    <%- include('partials/sidebar', { page: 'withdrawal' }) %>
+
+    <!-- ============================================ -->
+    <!-- MOBILE LAYOUT (visible only on < lg screens) -->
+    <!-- ============================================ -->
+    <div class="lg:hidden bg-[#f8fafb] min-h-screen pb-24">
+        <!-- App Bar -->
+        <div class="bg-white border-b border-gray-100 px-4 py-4 sticky top-0 z-20 flex items-center justify-between">
+            <h1 class="text-lg font-bold text-gray-800 tracking-tight">Penarikan</h1>
+            <div class="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center">
+                <i class="fas fa-money-check text-sm"></i>
+            </div>
+        </div>
+
+        <div class="p-4">
+            <!-- Withdrawal Form Mobile -->
+            <div class="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-gray-100 mb-6">
+                <h3 class="text-sm font-bold text-gray-800 mb-4 px-1">Form Penarikan</h3>
+                
+                <form id="withdrawalFormMobile">
+                    <div class="mb-5">
+                        <label class="block text-gray-700 text-xs font-bold mb-2">Jumlah Penarikan (Min Rp 100rb)</label>
+                        <input type="number" name="amount" min="100000" step="1000" required
+                            class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border-transparent focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-100 outline-none transition text-lg font-semibold"
+                            placeholder="Contoh: 100000">
+                    </div>
+
+                    <div class="bg-gray-50 rounded-xl p-4 mb-5 border border-gray-100 shadow-sm">
+                        <h4 class="font-bold text-gray-800 text-sm mb-2.5 flex items-center gap-1.5">
+                            <i class="fas fa-university text-red-500"></i> Rekening Tujuan
+                        </h4>
+                        <div class="space-y-1.5 text-xs text-gray-600">
+                            <p class="flex justify-between items-center"><span class="text-gray-500 font-medium">Bank:</span> <span id="userBankMobile" class="font-bold text-gray-900 text-sm"></span></p>
+                            <p class="flex justify-between items-center"><span class="text-gray-500 font-medium">No. Rekening:</span> <span id="userAccountMobile" class="font-mono font-bold text-gray-900 text-sm"></span></p>
+                            <p class="flex justify-between items-center"><span class="text-gray-500 font-medium">Atas Nama:</span> <span id="userNameMobile" class="font-bold text-gray-900 text-sm"></span></p>
+                        </div>
+                    </div>
+
+                    <button type="submit"
+                        class="w-full py-3.5 rounded-xl bg-red-600 text-white font-bold hover:bg-red-700 transition shadow-lg shadow-red-200 flex items-center justify-center gap-2">
+                        <i class="fas fa-paper-plane"></i> Ajukan Penarikan
+                    </button>
+                </form>
+            </div>
+
+            <!-- History Section Mobile -->
+            <h3 class="text-sm font-bold text-gray-800 mb-3 px-1">Riwayat Penarikan</h3>
+            <div id="withdrawalHistoryMobile" class="space-y-3"></div>
+            <div id="loadMoreContainerMobile" class="hidden mt-4 text-center">
+                <button id="loadMoreBtnMobile" class="px-5 py-2 rounded-full bg-white border border-gray-200 text-gray-600 text-xs font-semibold shadow-sm">
+                    Muat Lebih Banyak
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- DESKTOP LAYOUT (visible only on >= lg screens) -->
+    <!-- ============================================ -->
+    <div class="hidden lg:block lg:ml-64 p-8 pb-8">
+        <div class="mb-5 lg:mb-8">
+            <h1 class="text-2xl lg:text-3xl font-bold text-gray-800 mb-2">Penarikan</h1>
+            <p class="text-gray-600">Tarik saldo Anda</p>
+        </div>
+
+        <!-- Withdrawal Form -->
+        <div class="glass rounded-2xl p-4 lg:p-6 shadow-lg mb-5 lg:mb-8">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fas fa-money-check text-red-600"></i> Form Penarikan
+            </h3>
+            <p class="text-sm text-gray-600 mb-4">Minimal penarikan: Rp 100.000</p>
+
+            <form id="withdrawalFormDesktop">
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-semibold mb-2">Jumlah Penarikan</label>
+                    <input type="number" name="amount" min="100000" step="1000" required
+                        class="w-full px-4 py-3 rounded-lg bg-white/70 border border-gray-300 focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 outline-none transition"
+                        placeholder="Masukkan jumlah (min Rp 100.000)">
+                </div>
+
+                <div class="bg-gray-50 rounded-xl p-4 mb-5 border border-gray-200/80">
+                    <h4 class="font-bold text-gray-800 text-base mb-3 flex items-center gap-2">
+                        <i class="fas fa-university text-red-500"></i> Rekening Tujuan
+                    </h4>
+                    <div class="space-y-2 text-sm text-gray-700">
+                        <p class="flex justify-between items-center max-w-md"><span class="text-gray-500 font-medium">Bank:</span> <span id="userBankDesktop" class="font-bold text-gray-900 text-base"></span></p>
+                        <p class="flex justify-between items-center max-w-md"><span class="text-gray-500 font-medium">No. Rekening:</span> <span id="userAccountDesktop" class="font-mono font-bold text-gray-900 text-base"></span></p>
+                        <p class="flex justify-between items-center max-w-md"><span class="text-gray-500 font-medium">Atas Nama:</span> <span id="userNameDesktop" class="font-bold text-gray-900 text-base"></span></p>
+                    </div>
+                </div>
+
+                <button type="submit"
+                    class="w-full py-3 rounded-lg bg-gradient-to-r from-red-600 to-pink-600 text-white font-semibold hover:from-red-700 hover:to-pink-700 transition shadow-lg">
+                    <i class="fas fa-paper-plane"></i> Ajukan Penarikan
+                </button>
+            </form>
+        </div>
+
+        <!-- Withdrawal History -->
+        <div class="glass rounded-2xl p-4 lg:p-6 shadow-lg">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">
+                <i class="fas fa-history text-emerald-600"></i> Riwayat Penarikan
+            </h3>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead>
+                        <tr class="border-b border-gray-200">
+                            <th class="text-left py-3 px-2 text-sm font-semibold text-gray-600">Tanggal</th>
+                            <th class="text-left py-3 px-2 text-sm font-semibold text-gray-600">Jumlah</th>
+                            <th class="text-left py-3 px-2 text-sm font-semibold text-gray-600">Bank</th>
+                            <th class="text-left py-3 px-2 text-sm font-semibold text-gray-600">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="withdrawalHistoryDesktop"></tbody>
+                </table>
+            </div>
+            <!-- Pagination (Desktop) -->
+            <div id="paginationContainerDesktop" class="hidden mt-6 flex items-center justify-between border-t border-gray-150 pt-4">
+                <div class="text-sm text-gray-600" id="paginationInfoDesktop"></div>
+                <div class="flex gap-1" id="paginationPagesDesktop"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- PIN Verification Modal -->
+    <div id="pinVerificationModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-gray-100 relative">
+            <button type="button" onclick="closePinModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+            <div class="text-center mb-5">
+                <div class="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 text-xl">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3 class="text-lg font-bold text-gray-900">Verifikasi PIN Transaksi</h3>
+                <p class="text-xs text-gray-500 mt-1">Masukkan 6-digit PIN Transaksi Anda untuk konfirmasi penarikan <span id="pinModalAmount" class="font-extrabold text-red-600"></span></p>
+            </div>
+            
+            <form id="pinModalForm" class="space-y-4">
+                <div>
+                    <input type="password" id="inputModalPin" maxlength="6" pattern="\d{6}" inputmode="numeric" required autofocus
+                        class="w-full px-4 py-3.5 rounded-xl bg-gray-50 border border-gray-200 focus:bg-white focus:border-red-500 focus:ring-2 focus:ring-red-100 outline-none transition text-xl font-mono tracking-widest text-center font-bold"
+                        placeholder="******">
+                </div>
+                
+                <div class="flex gap-2">
+                    <button type="button" onclick="closePinModal()" class="w-1/2 py-3 rounded-xl bg-gray-100 text-gray-700 font-semibold text-sm hover:bg-gray-200 transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="w-1/2 py-3 rounded-xl bg-red-600 text-white font-bold text-sm hover:bg-red-700 transition shadow-md shadow-red-200">
+                        Konfirmasi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <%- include('partials/footer') %>
+
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+    <script src="/js/toast.js?v=<%= Date.now() %>"></script>
+    <script src="/js/withdrawal.js?v=<%= Date.now() %>"></script>
+    <%- include('partials/pwa-script') %>
+</body>
+</html>

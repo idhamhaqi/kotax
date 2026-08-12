@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Primary Meta Tags -->
+    <title>Kuotax | Bisnis Kuota Pintar Tanpa Buka Konter</title>
+    <meta name="title" content="Kuotax | Bisnis Kuota Pintar Tanpa Buka Konter">
+    <meta name="description" content="Platform bisnis kuota P2P aggregator tercepat di Indonesia. Jadi penyedia likuiditas tanpa perlu modal besar, sewa ruko, atau mencari pembeli. Sistem berjalan otomatis dengan kecepatan eksekusi milidetik.">
+    <meta name="keywords" content="bisnis kuota, agen pulsa, aggregator kuota, jual pulsa tanpa modal, bisnis passive income, penyedia likuiditas kuota, kuotax, investasi kuota">
+    <meta name="author" content="Kuotax Platform">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="Indonesian">
+    <link rel="canonical" href="https://kuotax.web.id">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/images/icon.png">
+    <link rel="shortcut icon" href="/images/icon.png">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kuotax.web.id/">
+    <meta property="og:title" content="Kuotax | Bisnis Kuota Pintar Tanpa Buka Konter">
+    <meta property="og:description" content="Platform bisnis kuota P2P aggregator tercepat di Indonesia. Jadi penyedia likuiditas tanpa perlu modal besar, sewa ruko, atau mencari pembeli.">
+    <meta property="og:image" content="/ogimage.webp">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://kuotax.web.id/">
+    <meta property="twitter:title" content="Kuotax | Bisnis Kuota Pintar Tanpa Buka Konter">
+    <meta property="twitter:description" content="Platform bisnis kuota P2P aggregator tercepat di Indonesia. Jadi penyedia likuiditas tanpa perlu modal besar, sewa ruko, atau mencari pembeli.">
+
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Kuotax",
+      "operatingSystem": "Web",
+      "applicationCategory": "BusinessApplication",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "IDR"
+      },
+      "description": "Platform bisnis kuota P2P aggregator tercepat di Indonesia tanpa perlu buka konter.",
+      "url": "https://kuotax.web.id"
+    }
+    </script>
+    
+    <!-- Fonts & Icons (UI/UX Pro Max: Plus Jakarta Sans Typography) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Tailwind CSS (via compiled style.css) -->
+    <link rel="stylesheet" href="/css/style.css?v=6">
+    
+    <!-- AOS Animation -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+            overflow-x: hidden;
+        }
+        
+        /* Premium Mesh Gradients */
+        .hero-mesh {
+            background-color: #ffffff;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(59, 130, 246, 0.08) 0px, transparent 50%),
+                radial-gradient(at 50% 100%, rgba(245, 158, 11, 0.06) 0px, transparent 50%);
+        }
+
+        /* Glassmorphism Navigation */
+        .glass-nav {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+        }
+        
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(226, 232, 240, 0.9);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.04);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .glass-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px -10px rgba(16, 185, 129, 0.12);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(1deg); }
+        }
+        
+        .animate-float {
+            animation: float 5s ease-in-out infinite;
+        }
+        
+        .animate-float-delayed {
+            animation: float 5s ease-in-out 2.5s infinite;
+        }
+
+        /* Text Gradients */
+        .text-gradient {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .text-gradient-gold {
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-emerald-500 selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="glass-nav fixed w-full z-50 top-0 transition-all duration-300 py-3">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-6">
+                    <a href="/" class="flex items-center gap-2">
+                        <img src="/images/logoa.png" alt="Kuotax Logo" class="h-10 w-auto">
+                    </a>
+                    <a href="/mitra" class="hidden md:flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-emerald-600 transition-colors bg-slate-100/80 px-3 py-1.5 rounded-full border border-slate-200">
+                        <i class="fas fa-server text-emerald-600"></i> Mitra API B2B
+                    </a>
+                </div>
+                <div class="flex items-center gap-3 sm:gap-4">
+                    <% if (locals.hasSession) { %>
+                        <a href="/dashboard" class="px-5 py-2.5 text-xs sm:text-sm font-bold rounded-full bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-md shadow-emerald-600/20 flex items-center gap-2">
+                            Ke Dashboard <i class="fas fa-arrow-right text-xs"></i>
+                        </a>
+                    <% } else { %>
+                        <a href="/login" class="text-slate-700 hover:text-emerald-700 font-bold text-xs sm:text-sm transition-colors px-3 py-2">Masuk</a>
+                        <a href="/register" class="px-5 py-2.5 text-xs sm:text-sm font-bold rounded-full bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-md shadow-emerald-600/20 flex items-center gap-1.5">
+                            Daftar Gratis <i class="fas fa-user-plus text-xs"></i>
+                        </a>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-mesh pt-32 pb-20 lg:pt-44 lg:pb-28 border-b border-slate-200 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+                <!-- Text Content -->
+                <div class="text-center lg:text-left" data-aos="fade-right" data-aos-duration="800">
+                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs sm:text-sm font-extrabold mb-6 uppercase tracking-wider shadow-sm">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        P2P Kuota Aggregator Pertama di Indonesia
+                    </div>
+                    <h1 class="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-6 tracking-tight">
+                        Bisnis Kuota Pintar <br>
+                        <span class="text-gradient">Tanpa Perlu Buka Konter</span>
+                    </h1>
+                    <p class="text-base sm:text-lg text-slate-600 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-medium">
+                        Tidak perlu modal besar untuk sewa ruko atau mencari pembeli manual. Sistem kami menyalurkan ribuan pesanan dari jaringan mitra B2B seluruh Indonesia langsung ke saldo Anda secara otomatis.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row gap-3.5 justify-center lg:justify-start">
+                        <a href="<%= locals.hasSession ? '/dashboard' : '/register' %>" 
+                            class="px-8 py-4 rounded-full bg-emerald-600 text-white font-extrabold text-base hover:bg-emerald-700 hover:-translate-y-0.5 transition-all shadow-lg shadow-emerald-600/30 flex items-center justify-center gap-2">
+                            <i class="fas fa-rocket"></i> Mulai Bisnis Sekarang
+                        </a>
+                        <a href="#how-it-works" 
+                            class="px-8 py-4 rounded-full bg-white text-slate-700 font-bold text-base hover:bg-slate-50 transition-all border border-slate-300 shadow-sm flex items-center justify-center gap-2">
+                            Lihat Cara Kerjanya
+                        </a>
+                    </div>
+                    
+                    <!-- Trust Badges -->
+                    <div class="mt-10 flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 text-slate-700 text-xs sm:text-sm font-bold">
+                        <div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-sm">
+                            <i class="fas fa-bolt text-amber-500"></i> Eksekusi Milidetik
+                        </div>
+                        <div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-sm">
+                            <i class="fas fa-shield-alt text-emerald-600"></i> Pencairan Kapan Saja
+                        </div>
+                        <div class="flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-slate-200 shadow-sm">
+                            <i class="fas fa-lock text-blue-600"></i> Proteksi Anti Double-Spend
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive Dashboard Mockup -->
+                <div class="relative hidden md:block" data-aos="fade-left" data-aos-duration="800" data-aos-delay="150">
+                    <div class="glass-card rounded-3xl p-3 shadow-2xl animate-float z-20 relative bg-white border border-slate-200">
+                        <div class="bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden text-white">
+                            <!-- Window Header -->
+                            <div class="bg-slate-950 px-4 py-3 flex justify-between items-center border-b border-slate-800">
+                                <div class="flex gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-amber-500"></div>
+                                    <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+                                </div>
+                                <span class="text-[11px] text-slate-400 font-mono font-bold flex items-center gap-1.5">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Live WebSocket Network
+                                </span>
+                            </div>
+                            <!-- Mockup Content -->
+                            <div class="p-6">
+                                <div class="flex justify-between items-center mb-6 bg-slate-800/80 p-4 rounded-xl border border-slate-700">
+                                    <div>
+                                        <p class="text-slate-400 text-xs font-bold mb-0.5 uppercase tracking-wider">Total Saldo Likuiditas</p>
+                                        <h3 class="text-2xl font-black text-white tracking-tight">Rp 2.450.000</h3>
+                                    </div>
+                                    <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30 text-xl font-bold">
+                                        <i class="fas fa-wallet"></i>
+                                    </div>
+                                </div>
+                                
+                                <p class="text-[11px] font-bold text-slate-400 mb-3 uppercase tracking-wider">Antrean Order Realtime Masuk</p>
+                                
+                                <!-- Mock Order 1 -->
+                                <div class="bg-slate-800 rounded-xl p-4 border border-emerald-500/40 relative overflow-hidden mb-3 shadow-md">
+                                    <div class="absolute right-0 top-0 bottom-0 w-1.5 bg-emerald-500"></div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <div class="flex items-center gap-2">
+                                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                                            <span class="text-xs font-bold px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded border border-blue-500/30">Telkomsel</span>
+                                        </div>
+                                        <span class="text-xs text-emerald-400 font-extrabold bg-emerald-500/20 px-2 py-0.5 rounded border border-emerald-500/30">Profit +Rp 600</span>
+                                    </div>
+                                    <div class="flex justify-between items-end">
+                                        <div>
+                                            <p class="text-white font-bold text-sm mb-0.5">Paket Data 15GB 30 Hari</p>
+                                            <p class="text-slate-400 text-xs font-mono">0812-3456-XXXX</p>
+                                        </div>
+                                        <div class="text-right">
+                                            <p class="text-lg text-white font-black">Rp 30.600</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Mock Order 2 -->
+                                <div class="bg-slate-800/50 rounded-xl p-4 border border-slate-700/60 opacity-60">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs font-bold px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded border border-amber-500/30">Indosat</span>
+                                        <span class="text-[11px] text-slate-400 font-medium">Diambil agen lain</span>
+                                    </div>
+                                    <div class="flex justify-between items-end">
+                                        <div>
+                                            <p class="text-slate-300 font-bold text-sm mb-0.5">Freedom 10GB</p>
+                                            <p class="text-slate-500 text-xs font-mono">0857-1234-XXXX</p>
+                                        </div>
+                                        <p class="text-base text-slate-500 font-bold line-through">Rp 20.400</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Floating Speed Badge -->
+                    <div class="absolute -bottom-6 -left-8 bg-white rounded-2xl p-4 shadow-xl animate-float-delayed z-30 flex items-center gap-3.5 border border-slate-200">
+                        <div class="w-11 h-11 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl font-bold">
+                            <i class="fas fa-bolt"></i>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Kecepatan Eksekusi</p>
+                            <p class="text-base font-black text-slate-900">&lt; 50 Milidetik</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it Works Section -->
+    <section id="how-it-works" class="py-20 lg:py-28 bg-white relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16" data-aos="fade-up">
+                <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase mb-2 block">Sistem Kerja Sederhana</span>
+                <h2 class="text-3xl md:text-5xl font-black text-slate-900 mb-5 tracking-tight">Mekanisme Bisnis 3 Langkah</h2>
+                <p class="text-base sm:text-lg text-slate-600 font-medium leading-relaxed">Sistem kami memotong semua kerumitan. Anda tidak perlu mencari pembeli manual, antrean pesanan dari mitra B2B disalurkan langsung secara realtime.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8 relative">
+                <!-- Step 1 -->
+                <div class="glass-card p-8 rounded-3xl text-center relative z-10" data-aos="fade-up" data-aos-delay="100">
+                    <div class="w-16 h-16 mx-auto bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-blue-500/25 text-white text-2xl font-black">
+                        1
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Salurkan Likuiditas</h3>
+                    <p class="text-slate-600 font-medium text-sm leading-relaxed">
+                        Isi saldo deposit Anda sebagai Liquidity Provider. Saldo Anda siap diputar langsung untuk memproses antrean orderan B2B yang masuk secara otomatis.
+                    </p>
+                </div>
+                
+                <!-- Step 2 -->
+                <div class="glass-card p-8 rounded-3xl text-center relative z-10" data-aos="fade-up" data-aos-delay="200">
+                    <div class="w-16 h-16 mx-auto bg-gradient-to-br from-amber-400 to-orange-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-orange-500/25 text-white text-2xl font-black">
+                        2
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Eksekusi Pesanan</h3>
+                    <p class="text-slate-600 font-medium text-sm leading-relaxed">
+                        Antrean pesanan dari seluruh penjuru Indonesia muncul secara live via WebSocket. Cukup klik <strong class="text-slate-900">"Fill Order"</strong> untuk mengambil alokasi.
+                    </p>
+                </div>
+                
+                <!-- Step 3 -->
+                <div class="glass-card p-8 rounded-3xl text-center relative z-10 border-b-4 border-b-emerald-500" data-aos="fade-up" data-aos-delay="300">
+                    <div class="w-16 h-16 mx-auto bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center mb-6 shadow-lg shadow-emerald-500/25 text-white text-2xl font-black">
+                        3
+                    </div>
+                    <h3 class="text-xl font-bold text-slate-900 mb-3">Terima Hasil & Margin</h3>
+                    <p class="text-slate-600 font-medium text-sm leading-relaxed">
+                        Setelah pesanan dieksekusi, modal transaksi dikembalikan seketika beserta profit margin bersih yang langsung menambah Saldo Utama Anda.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROI / Profit Calculator Section -->
+    <section class="py-20 lg:py-28 bg-slate-950 relative overflow-hidden border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <div data-aos="fade-right">
+                    <h2 class="text-3xl md:text-5xl font-black text-white mb-6 leading-tight tracking-tight">
+                        Bagaimana Sistem Ini <br><span class="text-gradient-gold">Bekerja Untuk Anda?</span>
+                    </h2>
+                    <p class="text-base sm:text-lg text-slate-300 mb-8 leading-relaxed font-normal">
+                        Dengan sistem <strong class="text-white">Smart ROI Target</strong>, likuiditas modal Anda diputar secara cerdas puluhan kali dalam sehari untuk memenuhi kebutuhan ribuan mitra konter secara efisien.
+                    </p>
+                    
+                    <ul class="space-y-5">
+                        <li class="flex items-start gap-4">
+                            <div class="mt-1 w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-400">
+                                <i class="fas fa-chart-line text-sm"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-white mb-1">Perputaran Modal Cepat</h3>
+                                <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">Modal yang sama bisa Anda putar penuh setiap harinya. Semakin aktif, semakin tinggi hasil yang didapatkan.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-4">
+                            <div class="mt-1 w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center shrink-0 text-emerald-400">
+                                <i class="fas fa-network-wired text-sm"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-bold text-white mb-1">Target Otomatis & Adil</h3>
+                                <p class="text-slate-400 text-xs sm:text-sm leading-relaxed">Sistem pusat mengatur alokasi harian secara adil untuk semua agen yang bersaing.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <!-- Calculator Card -->
+                <div class="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-2xl relative" data-aos="fade-left" data-aos-delay="150">
+                    <div class="absolute -top-3.5 right-6 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-extrabold px-4 py-1 rounded-full shadow-md text-xs uppercase tracking-wider">
+                        Simulasi ROI Bulanan
+                    </div>
+                    
+                    <h3 class="text-lg font-bold text-slate-800 mb-6 text-center border-b border-slate-200 pb-4">Ilustrasi Perputaran Harian</h3>
+                    
+                    <div class="space-y-4 mb-6">
+                        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-slate-600 text-xs font-bold">Modal Diputar / Hari</span>
+                                <span id="modal-display" class="text-slate-900 font-black font-mono text-base sm:text-lg">Rp 1.000.000</span>
+                            </div>
+                            <input type="range" id="modal-slider" min="0" max="5" step="1" value="2" class="w-full h-2.5 bg-emerald-200 rounded-lg appearance-none cursor-pointer accent-emerald-600">
+                            <div class="flex justify-between mt-2 text-[10px] text-slate-500 font-bold">
+                                <span>300K</span>
+                                <span>10JT</span>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-50 p-4 rounded-2xl border border-slate-200 text-xs sm:text-sm">
+                            <span class="text-slate-600 font-bold">Estimasi ROI Bulanan</span>
+                            <span class="text-emerald-700 font-extrabold font-mono">15% - 50%</span>
+                        </div>
+                        <div class="flex flex-col bg-emerald-50 p-4 rounded-2xl border border-emerald-200 gap-1 text-center md:text-left md:flex-row md:justify-between md:items-center">
+                            <span class="text-emerald-900 text-xs sm:text-sm font-bold">Estimasi Profit / Hari</span>
+                            <span id="daily-profit-display" class="text-emerald-700 font-black text-base md:text-lg font-mono">Rp 5.000 - Rp 16.666</span>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center pt-5 border-t border-slate-200">
+                        <p class="text-slate-600 text-xs font-bold mb-1">Total Keuntungan 30 Hari</p>
+                        <h4 id="monthly-profit-display" class="text-2xl sm:text-3xl font-black text-gradient-gold mb-2">Rp 150.000 - Rp 500.000</h4>
+                        <p class="text-[11px] text-slate-500 font-medium leading-normal">*Ilustrasi matematis berdasarkan rentang ROI 15%-50% dengan asumsi pemutaran modal penuh harian.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Program Affiliate / Referral Section -->
+    <section id="affiliate" class="py-20 lg:py-28 bg-gradient-to-br from-emerald-900 via-teal-900 to-slate-900 text-white relative overflow-hidden border-t border-emerald-800/50">
+        <!-- Abstract Glow Backgrounds -->
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-teal-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                
+                <!-- Left Info Text -->
+                <div class="lg:col-span-7" data-aos="fade-right">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold mb-6 uppercase tracking-wider shadow-sm">
+                        <i class="fas fa-users text-emerald-400"></i> Program Partnership & Affiliate
+                    </div>
+                    <h2 class="text-3xl md:text-5xl font-black text-white mb-6 leading-tight tracking-tight">
+                        Ciptakan Pasif Income <br>
+                        <span class="text-gradient-gold">Bonus 10% Selamanya</span>
+                    </h2>
+                    <p class="text-base sm:text-lg text-slate-300 mb-8 leading-relaxed font-normal max-w-2xl">
+                        Ajak rekan, konter, atau sesama pebisnis kuota untuk bergabung di Kuotax. Nikmati bagian profit pasif sebesar <strong class="text-emerald-400">10% dari setiap keuntungan order</strong> yang mereka hasilkan, berlaku selamanya tanpa batas waktu!
+                    </p>
+
+                    <div class="grid sm:grid-cols-3 gap-4 mb-8">
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 text-center">
+                            <div class="w-10 h-10 rounded-xl bg-emerald-500/30 text-emerald-300 flex items-center justify-center mx-auto mb-2 text-lg font-bold">
+                                <i class="fas fa-infinity"></i>
+                            </div>
+                            <h4 class="text-sm font-bold text-white mb-0.5">Bonus Lifetime</h4>
+                            <p class="text-[11px] text-slate-300">Komisi terus mengalir selama mitra aktif</p>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 text-center">
+                            <div class="w-10 h-10 rounded-xl bg-amber-500/30 text-amber-300 flex items-center justify-center mx-auto mb-2 text-lg font-bold">
+                                <i class="fas fa-percent"></i>
+                            </div>
+                            <h4 class="text-sm font-bold text-white mb-0.5">10% Dari Profit</h4>
+                            <p class="text-[11px] text-slate-300">Dihitung murni dari profit bersih order</p>
+                        </div>
+                        <div class="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/10 text-center">
+                            <div class="w-10 h-10 rounded-xl bg-blue-500/30 text-blue-300 flex items-center justify-center mx-auto mb-2 text-lg font-bold">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <h4 class="text-sm font-bold text-white mb-0.5">Masuk Ke Saldo</h4>
+                            <p class="text-[11px] text-slate-300">Langsung menambah Saldo Utama Anda</p>
+                        </div>
+                    </div>
+
+                    <a href="/register" class="inline-flex items-center justify-center px-8 py-4 text-base font-extrabold rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 transition-all shadow-lg shadow-emerald-500/30 hover:-translate-y-0.5 gap-2">
+                        <i class="fas fa-user-plus"></i> Daftar & Dapatkan Link Referral
+                    </a>
+                </div>
+
+                <!-- Right Card Box -->
+                <div class="lg:col-span-5" data-aos="fade-left">
+                    <div class="bg-white/10 backdrop-blur-xl rounded-3xl p-6 sm:p-8 border border-white/20 shadow-2xl relative">
+                        <div class="flex items-center gap-3 mb-6 pb-4 border-b border-white/10">
+                            <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-500 text-slate-900 flex items-center justify-center text-xl font-bold shadow-lg">
+                                <i class="fas fa-calculator"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-white">Simulasi Komisi Referral</h3>
+                                <p class="text-xs text-slate-300">Penghasilan pasif dari jaringan downline Anda</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4 text-xs sm:text-sm">
+                            <div class="flex justify-between items-center bg-black/20 p-3.5 rounded-xl border border-white/10">
+                                <span class="text-slate-300 font-medium">1 Downline Aktif (Profit Fill Order Rp 10.000/hari)</span>
+                                <span class="text-white font-bold font-mono">Bonus: Rp 1.000 / hari</span>
+                            </div>
+                            <div class="flex justify-between items-center bg-black/20 p-3.5 rounded-xl border border-white/10">
+                                <span class="text-slate-300 font-medium">Jika Memiliki 100 Downline Aktif</span>
+                                <span class="text-emerald-400 font-black font-mono text-base">Rp 100.000 / Hari</span>
+                            </div>
+                            <div class="bg-gradient-to-r from-emerald-500/20 to-teal-500/20 p-4 rounded-2xl border border-emerald-400/30 text-center">
+                                <p class="text-slate-300 text-xs font-bold mb-1">Estimasi Pasif Income Bulanan (100 Downline)</p>
+                                <h4 class="text-2xl sm:text-3xl font-black text-amber-300 font-mono">Rp 3.000.000 / Bulan</h4>
+                                <p class="text-[10px] text-slate-400 mt-1">*Murni pasif income harian dari 10% profit transaksi Fill Order jaringan 100 referral Anda</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="py-20 lg:py-28 bg-slate-50 border-t border-slate-200">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-14" data-aos="fade-up">
+                <span class="text-xs font-bold text-emerald-600 tracking-wider uppercase mb-2 block">Pertanyaan Umum</span>
+                <h2 class="text-3xl md:text-4xl font-black text-slate-900 tracking-tight">FAQ (Frequently Asked Questions)</h2>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" data-aos="fade-up">
+                    <h3 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2.5">
+                        <i class="fas fa-question-circle text-emerald-600"></i>
+                        Berapa minimal modal deposit untuk mulai?
+                    </h3>
+                    <p class="text-slate-600 text-sm leading-relaxed pl-7">
+                        Minimal deposit awal di Kuotax adalah <strong>Rp 100.000</strong>. Anda dapat memilih nominal deposit fleksibel yang akan terverifikasi secara otomatis via sistem Webhook.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" data-aos="fade-up">
+                    <h3 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2.5">
+                        <i class="fas fa-question-circle text-emerald-600"></i>
+                        Berapa minimal penarikan saldo (Withdrawal)?
+                    </h3>
+                    <p class="text-slate-600 text-sm leading-relaxed pl-7">
+                        Minimal penarikan saldo adalah <strong>Rp 100.000</strong>. Keuntungan bersih dan saldo modal Anda dapat ditarik kapan saja ke rekening bank terdaftar dengan verifikasi PIN 6-Digit aman.
+                    </p>
+                </div>
+
+                <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm" data-aos="fade-up">
+                    <h3 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2.5">
+                        <i class="fas fa-question-circle text-emerald-600"></i>
+                        Bagaimana cara kerja Program Referral Kuotax?
+                    </h3>
+                    <p class="text-slate-600 text-sm leading-relaxed pl-7">
+                        Anda akan mendapatkan komisi pasif sebesar <strong>10% dari profit bersih</strong> setiap kali downline langsung Anda memproses transaksi order, berlaku <strong>selamanya (lifetime)</strong> tanpa batas waktu.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="mt-14 text-center" data-aos="zoom-in">
+                <a href="/register" class="inline-flex items-center justify-center px-8 py-4 text-base font-extrabold rounded-full bg-emerald-600 text-white hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 hover:-translate-y-0.5 gap-2">
+                    Daftar Akun Sekarang <i class="fas fa-arrow-right text-xs"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <%- include('partials/public-footer') %>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            once: true,
+            offset: 40,
+            duration: 700,
+            easing: 'ease-out-cubic'
+        });
+
+        // Calculator Interactive Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const modalValues = [300000, 500000, 1000000, 2000000, 5000000, 10000000];
+            const slider = document.getElementById('modal-slider');
+            const modalDisplay = document.getElementById('modal-display');
+            const dailyDisplay = document.getElementById('daily-profit-display');
+            const monthlyDisplay = document.getElementById('monthly-profit-display');
+
+            function formatRupiah(number) {
+                return 'Rp ' + Math.floor(number).toLocaleString('id-ID');
+            }
+
+            function updateCalculator() {
+                if (!slider) return;
+                const modal = modalValues[slider.value];
+                const minMonthly = modal * 0.15;
+                const maxMonthly = modal * 0.50;
+                const minDaily = minMonthly / 30;
+                const maxDaily = maxMonthly / 30;
+
+                modalDisplay.textContent = formatRupiah(modal);
+                if (dailyDisplay) dailyDisplay.textContent = formatRupiah(minDaily) + ' - ' + formatRupiah(maxDaily);
+                if (monthlyDisplay) monthlyDisplay.textContent = formatRupiah(minMonthly) + ' - ' + formatRupiah(maxMonthly);
+            }
+
+            if (slider) {
+                slider.addEventListener('input', updateCalculator);
+                updateCalculator();
+            }
+        });
+    </script>
+</body>
+</html>

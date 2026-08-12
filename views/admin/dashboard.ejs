@@ -1,0 +1,154 @@
+<%- include('partials/header', { title: 'Dashboard', page: 'dashboard' }) %>
+
+<div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+    <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Dashboard Overview</h2>
+    <span class="text-xs bg-emerald-100 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-full font-semibold self-start sm:self-auto">
+        <i class="fas fa-filter mr-1"></i> Data Real User Only
+    </span>
+</div>
+
+<!-- Stats Cards -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <!-- Total Users -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm mb-1">Total Users</p>
+                <h3 class="text-3xl font-bold text-gray-800"><%= stats.users.total_users %></h3>
+            </div>
+            <div class="bg-emerald-100 p-4 rounded-full">
+                <i class="fas fa-users text-emerald-600 text-2xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Balance -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm mb-1">Total Balance</p>
+                <h3 class="text-2xl font-bold text-gray-800">Rp <%= parseInt(stats.users.total_balance || 0).toLocaleString('id-ID') %></h3>
+            </div>
+            <div class="bg-green-100 p-4 rounded-full">
+                <i class="fas fa-wallet text-green-600 text-2xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Total Quota -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm mb-1">Total Quota</p>
+                <h3 class="text-2xl font-bold text-gray-800"><%= parseFloat(stats.users.total_quota || 0).toFixed(2) %> GB</h3>
+            </div>
+            <div class="bg-emerald-100 p-4 rounded-full">
+                <i class="fas fa-database text-emerald-600 text-2xl"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pending Approvals -->
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <p class="text-gray-500 text-sm mb-1">Pending Approvals</p>
+                <h3 class="text-3xl font-bold text-gray-800"><%= stats.pendingDeposits + stats.pendingWithdrawals %></h3>
+                <p class="text-xs text-gray-500 mt-1">
+                    <%= stats.pendingDeposits %> deposits, <%= stats.pendingWithdrawals %> withdrawals
+                </p>
+            </div>
+            <div class="bg-yellow-100 p-4 rounded-full">
+                <i class="fas fa-clock text-yellow-600 text-2xl"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Transaction Stats -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <h4 class="text-lg font-semibold text-gray-700 mb-4">
+            <i class="fas fa-arrow-down text-green-600 mr-2"></i> Total Deposits
+        </h4>
+        <p class="text-3xl font-bold text-green-600">
+            Rp <%= parseInt(stats.transactions.total_deposits || 0).toLocaleString('id-ID') %>
+        </p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <h4 class="text-lg font-semibold text-gray-700 mb-4">
+            <i class="fas fa-arrow-up text-red-600 mr-2"></i> Total Withdrawals
+        </h4>
+        <p class="text-3xl font-bold text-red-600">
+            Rp <%= parseInt(stats.transactions.total_withdrawals || 0).toLocaleString('id-ID') %>
+        </p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg p-6">
+        <h4 class="text-lg font-semibold text-gray-700 mb-4">
+            <i class="fas fa-handshake text-emerald-600 mr-2"></i> Total Fill Orders
+        </h4>
+        <p class="text-3xl font-bold text-emerald-600">
+            Rp <%= parseInt(stats.transactions.total_fill_orders || 0).toLocaleString('id-ID') %>
+        </p>
+    </div>
+</div>
+
+<!-- Recent Users -->
+<div class="bg-white rounded-xl shadow-lg p-6">
+    <h3 class="text-xl font-bold text-gray-800 mb-4">
+        <i class="fas fa-user-plus text-emerald-600 mr-2"></i> Recent Users
+    </h3>
+    <div class="overflow-x-auto">
+        <table class="w-full">
+            <thead>
+                <tr class="border-b border-gray-200">
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">ID</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Name</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Email</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Balance</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Quota</th>
+                    <th class="text-left py-3 px-4 text-sm font-semibold text-gray-600">Registered</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% recentUsers.forEach(user => { %>
+                <tr class="border-b border-gray-100 hover:bg-gray-50 transition">
+                    <td class="py-3 px-4 text-sm text-gray-600">#<%= user.id %></td>
+                    <td class="py-3 px-4 text-sm font-semibold text-gray-700"><%= user.full_name %></td>
+                    <td class="py-3 px-4 text-sm text-gray-600"><%= user.email %></td>
+                    <td class="py-3 px-4 text-sm font-bold text-green-600">
+                        Rp <%= parseInt(user.balance).toLocaleString('id-ID') %>
+                    </td>
+                    <td class="py-3 px-4 text-sm font-bold text-emerald-600">
+                        <%= parseFloat(user.quota_gb).toFixed(2) %> GB
+                    </td>
+                    <td class="py-3 px-4 text-sm text-gray-600">
+                        <%= new Date(user.created_at).toLocaleDateString('id-ID') %>
+                    </td>
+                </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+
+<script>
+// Auto-refresh dashboard when there are updates from other admins
+if (typeof adminSocket !== 'undefined') {
+    adminSocket.on('stats-updated', () => {
+        // Show toast and reload after a short delay
+        if (typeof showToast === 'function') {
+            showToast('New update received, refreshing dashboard...', 'success');
+        }
+        setTimeout(() => {
+            location.reload();
+        }, 1500);
+    });
+}
+</script>
+
+<%- include('partials/footer') %>

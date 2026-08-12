@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verifikasi Email - Kuotax</title>
+    <link rel="icon" type="image/png" href="/images/icon.png">
+    <link rel="stylesheet" href="/css/style.css?v=7">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background: #f8fafb; margin: 0; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .verify-container {
+            flex: 1; display: flex; align-items: center; justify-content: center; padding: 24px;
+        }
+        
+        .verify-card {
+            background: #fff; width: 100%; max-width: 440px; border-radius: 20px;
+            padding: 40px 32px; box-shadow: 0 10px 40px rgba(0,0,0,0.04);
+            border: 1px solid #f0f0f0; text-align: center;
+        }
+
+        .icon-box {
+            width: 70px; height: 70px; border-radius: 50%; background: #ecfdf5;
+            color: #059669; font-size: 30px; display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 24px;
+        }
+
+        .otp-inputs {
+            display: flex; gap: 8px; justify-content: center; margin: 32px 0;
+        }
+
+        .otp-inputs input {
+            width: 45px; height: 55px; border-radius: 12px; border: 2px solid #e5e7eb;
+            background: #f9fafb; font-size: 24px; font-weight: 700; text-align: center;
+            color: #1f2937; outline: none; transition: all 0.2s;
+            -moz-appearance: textfield; /* Firefox */
+        }
+        
+        .otp-inputs input::-webkit-outer-spin-button,
+        .otp-inputs input::-webkit-inner-spin-button {
+            -webkit-appearance: none; margin: 0;
+        }
+
+        .otp-inputs input:focus {
+            border-color: #059669; background: #fff; box-shadow: 0 0 0 3px rgba(5,150,105,0.1);
+        }
+
+        .btn-verify {
+            width: 100%; padding: 16px; border-radius: 12px; background: #059669;
+            color: #fff; font-weight: 700; font-size: 16px; border: none;
+            cursor: pointer; transition: all 0.2s;
+        }
+        
+        .btn-verify:hover { background: #047857; transform: translateY(-1px); }
+        .btn-verify:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        .btn-resend {
+            background: none; border: none; color: #059669; font-weight: 600;
+            font-size: 14px; cursor: pointer; margin-top: 24px; transition: color 0.2s;
+        }
+        .btn-resend:hover { color: #047857; text-decoration: underline; }
+        .btn-resend:disabled { color: #9ca3af; cursor: not-allowed; text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <div class="verify-container">
+        <div class="verify-card">
+            <div class="icon-box">
+                <i class="fas fa-envelope-open-text"></i>
+            </div>
+            
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Periksa Email Anda</h2>
+            <p class="text-gray-500 text-sm mb-6 leading-relaxed">
+                Kami telah mengirimkan 6-digit kode verifikasi ke email<br>
+                <strong class="text-gray-700" id="userEmailDisplay"></strong>
+            </p>
+
+            <form id="verifyForm">
+                <input type="hidden" id="userEmail" name="email">
+                
+                <div class="otp-inputs" id="otpContainer">
+                    <input type="number" class="otp-input" maxlength="1" required autocomplete="off">
+                    <input type="number" class="otp-input" maxlength="1" required autocomplete="off">
+                    <input type="number" class="otp-input" maxlength="1" required autocomplete="off">
+                    <input type="number" class="otp-input" maxlength="1" required autocomplete="off">
+                    <input type="number" class="otp-input" maxlength="1" required autocomplete="off">
+                    <input type="number" class="otp-input" maxlength="1" required autocomplete="off">
+                </div>
+
+                <button type="submit" class="btn-verify" id="btnSubmit">
+                    Verifikasi Akun
+                </button>
+            </form>
+
+            <button type="button" class="btn-resend" id="btnResend" disabled>
+                Kirim Ulang Kode (<span id="countdown">60</span>s)
+            </button>
+        </div>
+    </div>
+
+    <div id="toast-container" class="fixed top-4 right-4 z-50"></div>
+    <script src="/js/toast.js?v=<%= Date.now() %>"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Get email from URL params
+            const urlParams = new URLSearchParams(window.location.search);
+            const email = urlParams.get('email');
+            
+            if (!email) {
+                window.location.href = '/login';
+                return;
+            }
+
+            document.getElementById('userEmail').value = email;
+            document.getElementById('userEmailDisplay').textContent = email;
+
+            // OTP Input logic
+            const inputs = document.querySelectorAll('.otp-input');
+            
+            inputs.forEach((input, index) => {
+                // Focus next on type
+                input.addEventListener('input', function() {
+                    if (this.value.length > 1) this.value = this.value.slice(0, 1); // limit 1 char
+                    if (this.value.length === 1 && index < inputs.length - 1) {
+                        inputs[index + 1].focus();
+                    }
+                });
+
+                // Backspace logic
+                input.addEventListener('keydown', function(e) {
+                    if (e.key === 'Backspace' && !this.value && index > 0) {
+                        inputs[index - 1].focus();
+                        inputs[index - 1].value = '';
+                    }
+                });
+                
+                // Paste logic
+                input.addEventListener('paste', function(e) {
+                    e.preventDefault();
+                    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+                    if (pasted) {
+                        for (let i = 0; i < pasted.length; i++) {
+                            if (inputs[i]) inputs[i].value = pasted[i];
+                        }
+                        if (pasted.length < 6) {
+                            inputs[pasted.length].focus();
+                        } else {
+                            inputs[5].focus();
+                            document.getElementById('btnSubmit').focus();
+                        }
+                    }
+                });
+            });
+            
+            // First input focus
+            inputs[0].focus();
+
+            // Submit logic
+            document.getElementById('verifyForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                let otpCode = '';
+                inputs.forEach(input => otpCode += input.value);
+                
+                if (otpCode.length !== 6) {
+                    showToast('Harap masukkan 6 digit kode OTP', 'error');
+                    return;
+                }
+                
+                const btn = document.getElementById('btnSubmit');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memverifikasi...';
+                btn.disabled = true;
+
+                try {
+                    const response = await fetch('/api/auth/verify-otp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, otpCode })
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showToast(result.message, 'success');
+                        setTimeout(() => {
+                            window.location.href = '/login';
+                        }, 2000);
+                    } else {
+                        showToast(result.message, 'error');
+                        inputs.forEach(input => input.value = '');
+                        inputs[0].focus();
+                        btn.innerHTML = 'Verifikasi Akun';
+                        btn.disabled = false;
+                    }
+                } catch (error) {
+                    showToast('Terjadi kesalahan server', 'error');
+                    btn.innerHTML = 'Verifikasi Akun';
+                    btn.disabled = false;
+                }
+            });
+
+            // Resend logic
+            const btnResend = document.getElementById('btnResend');
+            const countdownEl = document.getElementById('countdown');
+            let timeLeft = 60;
+            let timer;
+
+            function startTimer() {
+                btnResend.disabled = true;
+                timeLeft = 60;
+                
+                timer = setInterval(() => {
+                    timeLeft--;
+                    btnResend.innerHTML = 'Kirim Ulang Kode (<span id="countdown">' + timeLeft + '</span>s)';
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(timer);
+                        btnResend.disabled = false;
+                        btnResend.innerHTML = 'Kirim Ulang Kode';
+                    }
+                }, 1000);
+            }
+
+            startTimer();
+
+            btnResend.addEventListener('click', async () => {
+                btnResend.disabled = true;
+                btnResend.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+                
+                try {
+                    const response = await fetch('/api/auth/resend-otp', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    const result = await response.json();
+
+                    if (result.success) {
+                        showToast(result.message, 'success');
+                        startTimer();
+                    } else {
+                        showToast(result.message, 'error');
+                        btnResend.disabled = false;
+                        btnResend.innerHTML = 'Kirim Ulang Kode';
+                    }
+                } catch (error) {
+                    showToast('Gagal mengirim ulang kode', 'error');
+                    btnResend.disabled = false;
+                    btnResend.innerHTML = 'Kirim Ulang Kode';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{
+  "name": "kuota-aggregator",
+  "version": "1.0.0",
+  "description": "Kuota Aggregator Web Application",
+  "main": "server.js",
+  "scripts": {
+    "setup:db": "bun run scripts/init-db.js",
+    "start": "bun run setup:db && bun server.js",
+    "dev": "bun run setup:db && bun --watch server.js",
+    "prod": "bun run setup:db && NODE_ENV=production bun server.js",
+    "build:css": "bunx tailwindcss -i ./src/input.css -o ./public/css/style.css --minify",
+    "watch:css": "bunx tailwindcss -i ./src/input.css -o ./public/css/style.css --watch",
+    "dev:all": "bun run watch:css & bun --watch server.js"
+  },
+  "keywords": [
+    "kuota",
+    "aggregator",
+    "trading"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^17.2.3",
+    "ejs": "^3.1.10",
+    "express": "^4.18.2",
+    "express-rate-limit": "^7.1.5",
+    "express-session": "^1.17.3",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "multer": "^2.0.2",
+    "pg": "^8.22.0",
+    "qrcode": "^1.5.4",
+    "session-file-store": "^1.5.0",
+    "sharp": "^0.34.4",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^10.8.0",
+    "nodemon": "^3.0.2",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^3.4.18"
+  }
+}
