@@ -88,18 +88,24 @@
         @media (min-width: 1024px) {
             .d-reg-split { display: flex; min-height: 100vh; }
             .d-reg-branding {
-                width: 380px; flex-shrink: 0;
+                flex: 1;
+                max-width: 42%;
+                min-width: 380px;
                 background: linear-gradient(135deg, #059669 0%, #10b981 40%, #34d399 100%);
                 display: flex; flex-direction: column; align-items: center; justify-content: center;
-                padding: 48px 32px; position: relative; overflow: hidden;
+                padding: 48px 36px; position: relative; overflow: hidden;
             }
             .d-reg-branding::before {
                 content:''; position:absolute; top:-80px; right:-40px;
-                width:250px; height:250px; background:rgba(255,255,255,0.06); border-radius:50%;
+                width:300px; height:300px; background:rgba(255,255,255,0.06); border-radius:50%;
+            }
+            .d-reg-branding::after {
+                content:''; position:absolute; bottom:-50px; left:-30px;
+                width:200px; height:200px; background:rgba(255,255,255,0.04); border-radius:50%;
             }
             .d-reg-form-side {
-                flex: 1; display: flex; align-items: flex-start; justify-content: center;
-                padding: 48px; background: #f8fafb; overflow-y: auto;
+                flex: 1; display: flex; align-items: center; justify-content: center;
+                padding: 48px 32px; background: #f8fafb; overflow-y: auto;
             }
         }
 
@@ -266,18 +272,33 @@
         <!-- Left: Branding -->
         <div class="d-reg-branding">
             <div class="relative z-10 text-center">
-                <img src="/images/logoa.png" alt="Kuotax" class="h-24 w-auto mx-auto mb-5">
-                <h1 class="text-white text-2xl font-bold mb-2">Bergabung dengan Kuotax</h1>
-                <p class="text-white/70 text-sm max-w-xs mx-auto leading-relaxed">
-                    Daftar sekarang untuk memulai bisnis Anda
+                <img src="/images/logoa.png" alt="Kuotax" class="h-28 w-auto mx-auto mb-6">
+                <h1 class="text-white text-3xl font-bold mb-3">Bergabung dengan Kuotax</h1>
+                <p class="text-white/80 text-base max-w-sm mx-auto leading-relaxed">
+                    Daftar gratis sekarang dan nikmati platform marketplace kuota internet terbaik untuk bisnis Anda
                 </p>
-
+                <div class="flex items-center justify-center gap-6 mt-10">
+                    <div class="text-center">
+                        <p class="text-white text-2xl font-bold">1.000+</p>
+                        <p class="text-white/60 text-xs font-medium">Mitra Aktif</p>
+                    </div>
+                    <div class="w-px h-10 bg-white/20"></div>
+                    <div class="text-center">
+                        <p class="text-white text-2xl font-bold">10%</p>
+                        <p class="text-white/60 text-xs font-medium">Bonus Referral</p>
+                    </div>
+                    <div class="w-px h-10 bg-white/20"></div>
+                    <div class="text-center">
+                        <p class="text-white text-2xl font-bold">24/7</p>
+                        <p class="text-white/60 text-xs font-medium">Auto System</p>
+                    </div>
+                </div>
             </div>
         </div>
 
         <!-- Right: Form -->
         <div class="d-reg-form-side">
-            <div class="w-full max-w-2xl py-8">
+            <div class="w-full max-w-3xl py-6 px-4">
                 <div class="mb-6">
                     <h2 class="text-2xl font-bold text-gray-800 mb-1">Buat Akun Baru</h2>
                     <p class="text-gray-500 text-sm">Isi data diri Anda untuk bergabung</p>
