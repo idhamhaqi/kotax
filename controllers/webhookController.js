@@ -6,9 +6,17 @@ async function handleIncomingNotification(req, res) {
     const io = req.app.get('io');
     const { logWebhookEvent } = require('./adminController');
     const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
-    const body = req.body || {};
+    
+    let body = req.body || {};
+    if (typeof body === 'string') {
+        try {
+            body = JSON.parse(body);
+        } catch (_e) {
+            body = { text: body };
+        }
+    }
 
-    const text = body.text || body.message || body.content || body.body || body.notif_text || body.notification || body.ticker || '';
+    const text = body.text || body.message || body.content || body.body || body.notif_text || body.notification || body.ticker || body.title || body.description || body.raw_text || body.payload || (typeof body === 'string' ? body : '');
     const title = body.title || body.subject || body.header || '';
     const packageName = body.packageName || body.package || body.package_name || '';
     const appName = body.appName || body.app || packageName || 'Android App';

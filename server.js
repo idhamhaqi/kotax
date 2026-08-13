@@ -75,6 +75,11 @@ app.use(helmet({
 // =================================================================
 app.set('trust proxy', 1); 
 
+// Body parser and cookie parser (Must be BEFORE routes so JSON payloads are parsed!)
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(cookieParser());
+
 // Dedicated rate limiter for Webhook (high ceiling for Android Notif Bridge behind Cloudflare)
 const webhookLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -90,11 +95,6 @@ const limiter = rateLimit({
     message: { success: false, message: 'Terlalu banyak request. Silakan coba lagi nanti.' }
 });
 app.use('/api/', limiter);
-
-// Body parser and cookie parser
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 // Session configuration
 if (!process.env.SESSION_SECRET && process.env.NODE_ENV === 'production') {
