@@ -18,47 +18,17 @@
     </div>
 </div>
 
-<!-- Android Notif Bridge Webhook Integration Card -->
-<div class="bg-gradient-to-r from-slate-900 via-purple-950 to-slate-900 text-white rounded-2xl shadow-xl border border-purple-800/40 p-5 lg:p-6 mb-8 relative overflow-hidden">
-    <div class="absolute top-0 right-0 w-64 h-64 bg-purple-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 relative z-10">
-        <div class="space-y-2 max-w-2xl">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/20 border border-purple-400/30 text-purple-300 text-[11px] font-bold uppercase tracking-wider">
-                <i class="fab fa-android text-emerald-400"></i> Android Notification Bridge API
-            </div>
-            <h3 class="text-xl font-bold text-white flex items-center gap-2">
-                URL Endpoint Webhook Deposit Notifikasi
-            </h3>
-            <p class="text-xs text-slate-300 leading-relaxed">
-                Gunakan URL berikut pada aplikasi Android Notification Forwarder / Bridge Anda untuk mengirim data JSON notifikasi mutasi bank & e-wallet secara otomatis.
-            </p>
-        </div>
-
-        <!-- Copyable Input Group -->
-        <div class="w-full lg:w-auto flex-1 max-w-xl bg-black/40 p-3 rounded-xl border border-white/10 space-y-3">
-            <div>
-                <label class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Target Webhook URL (POST JSON)</label>
-                <div class="flex items-center gap-2">
-                    <input type="text" id="webhookUrlInput" readonly value="https://kuotax.web.id/api/webhook/deposit"
-                        class="w-full bg-slate-950 border border-slate-700 text-emerald-400 font-mono text-xs px-3 py-2 rounded-lg font-bold outline-none select-all">
-                    <button onclick="copyWebhookUrl()" class="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold text-xs rounded-lg transition shadow-md flex items-center gap-1.5 whitespace-nowrap">
-                        <i class="fas fa-copy"></i> Copy Link
-                    </button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2 text-[11px]">
-                <div class="bg-slate-950/80 px-2.5 py-1.5 rounded-lg border border-slate-800 flex justify-between items-center">
-                    <span class="text-slate-400">Method:</span>
-                    <span class="text-emerald-400 font-bold font-mono">POST</span>
-                </div>
-                <div class="bg-slate-950/80 px-2.5 py-1.5 rounded-lg border border-slate-800 flex justify-between items-center">
-                    <span class="text-slate-400">Content-Type:</span>
-                    <span class="text-purple-300 font-bold font-mono">application/json</span>
-                </div>
-            </div>
-        </div>
+<!-- Simple Copyable Webhook Link Bar -->
+<div class="bg-white rounded-2xl p-3.5 mb-6 border border-gray-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
+    <div class="flex items-center gap-2 text-xs font-bold text-gray-700 whitespace-nowrap">
+        <i class="fas fa-link text-purple-600"></i> Webhook URL:
+    </div>
+    <div class="flex items-center gap-2 w-full sm:w-auto flex-1 max-w-xl">
+        <input type="text" id="webhookUrlInput" readonly value="https://kuotax.web.id/api/webhook/deposit"
+            class="w-full bg-gray-50 border border-gray-200 text-purple-700 font-mono text-xs px-3 py-2 rounded-xl font-bold outline-none select-all focus:border-purple-400">
+        <button onclick="copyWebhookUrl()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+            <i class="fas fa-copy"></i> Copy
+        </button>
     </div>
 </div>
 
