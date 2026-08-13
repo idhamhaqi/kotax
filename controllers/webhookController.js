@@ -260,6 +260,7 @@ async function handleIncomingNotification(req, res) {
                     message: `Deposit Anda sebesar Rp ${creditAmount.toLocaleString('id-ID')} telah diverifikasi otomatis!`
                 });
                 io.to('user-' + userId).emit('balance-updated');
+                io.emit('deposit-status-changed', { depositId, userId, status: 'approved', amount: creditAmount });
                 io.to('admin').emit('deposit-updated', { id: depositId, status: 'approved' });
                 io.to('admin').emit('stats-updated');
             }

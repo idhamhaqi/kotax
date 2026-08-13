@@ -1123,28 +1123,105 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        // Socket.IO Realtime update for Deposit Page
+        // Real-time Auto Approval Handler & Smart Polling for Deposit Page
+        let currentUserId = null;
+        let depositPollTimer = null;
+
+        function handleAutoApproveSuccess(amount, message) {
+            // 1. Instantly close all modals
+            if (typeof closeModal === 'function') closeModal();
+            
+            const confirmModal = document.getElementById('confirmModal');
+            if (confirmModal) {
+                confirmModal.classList.add('hidden');
+                confirmModal.classList.remove('flex');
+            }
+            const depositModal = document.getElementById('depositModal');
+            if (depositModal) {
+                depositModal.classList.add('hidden');
+                depositModal.classList.remove('flex');
+            }
+            const cancelModal = document.getElementById('cancelDepositModal');
+            if (cancelModal) {
+                cancelModal.classList.add('hidden');
+                cancelModal.classList.remove('flex');
+            }
+
+            // 2. Stop polling timer
+            if (depositPollTimer) {
+                clearInterval(depositPollTimer);
+                depositPollTimer = null;
+            }
+
+            // 3. Clear current deposit state
+            currentDeposit = null;
+
+            // 4. Show success toast notification
+            const displayMsg = message || (amount ? `Deposit sebesar Rp ${parseInt(amount).toLocaleString('id-ID')} telah diverifikasi & disetujui otomatis!` : 'Deposit Anda telah diverifikasi & disetujui otomatis!');
+            showToast(displayMsg, 'success');
+
+            // 5. Reload history tables & balance
+            if (typeof loadDesktopDepositHistory === 'function') loadDesktopDepositHistory(1);
+            if (typeof loadMobileDepositHistory === 'function') loadMobileDepositHistory(false);
+            if (typeof updateHeaderBalance === 'function') updateHeaderBalance();
+        }
+
+        // Smart polling every 3 seconds to ensure real-time auto-approval even if socket reconnects
+        function startSmartDepositPolling() {
+            if (depositPollTimer) clearInterval(depositPollTimer);
+
+            depositPollTimer = setInterval(async () => {
+                try {
+                    const res = await fetch('/api/deposit/initiated');
+                    const result = await res.json();
+
+                    if (result.success) {
+                        if (currentDeposit && currentDeposit.id) {
+                            const stillInitiated = result.deposits && result.deposits.some(d => d.id === currentDeposit.id);
+                            if (!stillInitiated) {
+                                // Deposit has been approved by Webhook or Admin!
+                                handleAutoApproveSuccess(currentDeposit.uniqueAmount, 'Deposit Anda telah diverifikasi & disetujui otomatis!');
+                            }
+                        } else if (!result.deposits || result.deposits.length === 0) {
+                            // No initiated deposits remain
+                            if (typeof loadDesktopDepositHistory === 'function') loadDesktopDepositHistory(1);
+                            if (typeof loadMobileDepositHistory === 'function') loadMobileDepositHistory(false);
+                        }
+                    }
+                } catch (_e) {}
+            }, 3000);
+        }
+
+        // Start polling on page load
+        startSmartDepositPolling();
+
+        // Socket.IO Realtime listeners
         if (typeof io !== 'undefined') {
             const depositSocket = io();
             fetch('/api/profile/data')
                 .then(res => res.json())
                 .then(data => {
                     if (data.success && data.user && data.user.id) {
+                        currentUserId = data.user.id;
                         depositSocket.emit('register-user', data.user.id);
                     }
                 })
                 .catch(err => console.error('Socket register error:', err));
 
             depositSocket.on('deposit-approved', (data) => {
-                showToast(data.message || 'Deposit Anda telah diverifikasi otomatis!', 'success');
-                if (typeof closeModal === 'function') closeModal();
-                loadDesktopDepositHistory(1);
-                loadMobileDepositHistory(false);
+                handleAutoApproveSuccess(data.amount, data.message);
+            });
+
+            depositSocket.on('deposit-status-changed', (data) => {
+                if (currentUserId && Number(data.userId) === Number(currentUserId) && data.status === 'approved') {
+                    handleAutoApproveSuccess(data.amount, 'Deposit Anda telah diverifikasi & disetujui otomatis!');
+                }
             });
 
             depositSocket.on('balance-updated', () => {
-                loadDesktopDepositHistory(1);
-                loadMobileDepositHistory(false);
+                if (typeof loadDesktopDepositHistory === 'function') loadDesktopDepositHistory(1);
+                if (typeof loadMobileDepositHistory === 'function') loadMobileDepositHistory(false);
+                if (typeof updateHeaderBalance === 'function') updateHeaderBalance();
             });
         }
     </script>
