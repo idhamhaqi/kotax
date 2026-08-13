@@ -245,12 +245,7 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide flex items-center justify-between">
-                                    <span>Kode Referral <span class="text-red-500">*Wajib</span></span>
-                                    <span class="ref-locked-badge hidden text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                                        <i class="fas fa-lock text-[9px]"></i> Terkunci
-                                    </span>
-                                </label>
+                                <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Kode Referral <span class="text-red-500">*Wajib</span></label>
                                 <input type="text" name="referral_code" id="referralCodeMobile" required class="reg-input referral-input" placeholder="Masukkan kode referral">
                                 <div id="referralStatusMobile" class="ref-status"></div>
                             </div>
@@ -396,12 +391,7 @@
 
                     <!-- Row 6: Referral -->
                     <div>
-                        <label class="block text-gray-700 text-xs font-bold mb-1.5 flex items-center justify-between">
-                            <span>Kode Referral <span class="text-red-500">*Wajib</span></span>
-                            <span class="ref-locked-badge hidden text-[11px] text-emerald-600 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                                <i class="fas fa-lock text-[10px]"></i> Terkunci via Link Referral
-                            </span>
-                        </label>
+                        <label class="block text-gray-700 text-xs font-bold mb-1.5">Kode Referral <span class="text-red-500">*Wajib</span></label>
                         <input type="text" name="referral_code" id="referralCodeDesktop" required class="reg-input referral-input" placeholder="Masukkan kode referral">
                         <div id="referralStatusDesktop" class="ref-status"></div>
                     </div>
@@ -731,10 +721,6 @@
                 input.readOnly = true;
                 input.classList.add('bg-slate-100', 'cursor-not-allowed', 'font-mono', 'font-bold', 'text-emerald-700', 'border-emerald-300');
                 
-                const form = input.closest('form');
-                const badge = form.querySelector('.ref-locked-badge');
-                if (badge) badge.classList.remove('hidden');
-
                 input.dispatchEvent(new Event('input')); // Trigger validation
             });
             if (urlRefCode) {
