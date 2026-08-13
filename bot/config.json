@@ -1,0 +1,9 @@
+{
+  "targetUrl": "https://kuotax.web.id",
+  "email": "",
+  "password": "",
+  "autoStart": false,
+  "pollIntervalMs": 1500,
+  "minBalanceThreshold": 10000,
+  "webPort": 4000
+}

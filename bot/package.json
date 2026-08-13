@@ -1,0 +1,12 @@
+{
+  "name": "kuotax-auto-order-bot",
+  "version": "1.0.0",
+  "description": "Bot Otomatis Pemindai & Eksekutor Orderan Kuotax",
+  "main": "webServer.js",
+  "scripts": {
+    "start": "node webServer.js",
+    "cli": "node cli.js",
+    "bun": "bun run webServer.js"
+  },
+  "dependencies": {}
+}
