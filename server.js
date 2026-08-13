@@ -250,6 +250,8 @@ app.use('/api/support', require('./routes/support'));
 
 // Admin API
 app.get('/api/admin/webhooks', checkAdminAccessAPI, adminController.getWebhooksAPI);
+app.get('/api/admin/webhook-settings', checkAdminAccessAPI, adminController.getWebhookSettings);
+app.post('/api/admin/webhook-settings', checkAdminAccessAPI, adminController.updateWebhookSettings);
 app.post('/api/admin/users/update', checkAdminAccessAPI, adminController.updateUserBalance);
 
 // Admin Support Ticket API

@@ -18,18 +18,37 @@
     </div>
 </div>
 
-<!-- Simple Copyable Webhook Link Bar -->
-<div class="bg-white rounded-2xl p-3.5 mb-6 border border-gray-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3">
-    <div class="flex items-center gap-2 text-xs font-bold text-gray-700 whitespace-nowrap">
-        <i class="fas fa-link text-purple-600"></i> Webhook URL:
+<!-- Simple Copyable Webhook Link Bar & Secret Key Config -->
+<div class="bg-white rounded-2xl p-4 mb-6 border border-gray-200 shadow-sm space-y-3">
+    <div class="flex flex-col lg:flex-row items-center justify-between gap-3 pb-3 border-b border-gray-100">
+        <div class="flex items-center gap-2 text-xs font-bold text-gray-700 whitespace-nowrap">
+            <i class="fas fa-link text-purple-600"></i> Webhook URL:
+        </div>
+        <div class="flex items-center gap-2 w-full lg:w-auto flex-1 max-w-xl">
+            <input type="text" id="webhookUrlInput" readonly value="https://kuotax.web.id/api/webhook/deposit"
+                class="w-full bg-gray-50 border border-gray-200 text-purple-700 font-mono text-xs px-3 py-2 rounded-xl font-bold outline-none select-all focus:border-purple-400">
+            <button onclick="copyWebhookUrl()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                <i class="fas fa-copy"></i> Copy
+            </button>
+        </div>
     </div>
-    <div class="flex items-center gap-2 w-full sm:w-auto flex-1 max-w-xl">
-        <input type="text" id="webhookUrlInput" readonly value="https://kuotax.web.id/api/webhook/deposit"
-            class="w-full bg-gray-50 border border-gray-200 text-purple-700 font-mono text-xs px-3 py-2 rounded-xl font-bold outline-none select-all focus:border-purple-400">
-        <button onclick="copyWebhookUrl()" class="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-1.5 whitespace-nowrap">
-            <i class="fas fa-copy"></i> Copy
-        </button>
+
+    <!-- Dynamic Webhook Secret Key Config -->
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-1">
+        <div class="flex items-center gap-2 text-xs font-bold text-gray-700">
+            <i class="fas fa-key text-emerald-600"></i> Secret Key (Auth Token):
+        </div>
+        <div class="flex items-center gap-2 w-full sm:w-auto flex-1 max-w-xl">
+            <input type="text" id="webhookSecretInput" placeholder="Masukkan Secret Token (misal: @Bilingxxx) atau kosongkan"
+                class="w-full bg-gray-50 border border-gray-200 text-gray-800 font-mono text-xs px-3 py-2 rounded-xl font-bold outline-none focus:border-emerald-500 focus:bg-white transition">
+            <button onclick="saveWebhookSecret()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition shadow-sm flex items-center gap-1.5 whitespace-nowrap">
+                <i class="fas fa-save"></i> Simpan
+            </button>
+        </div>
     </div>
+    <p class="text-[11px] text-gray-400 font-medium italic">
+        <i class="fas fa-info-circle text-purple-400 mr-1"></i> Kosongkan kolom Secret Key jika Anda ingin menonaktifkan otentikasi (semua webhook diizinkan).
+    </p>
 </div>
 
 <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-4 lg:p-6 mb-8">
@@ -137,9 +156,12 @@ function renderTable(webhooks) {
 
     tbody.innerHTML = webhooks.map(wh => {
         const dateStr = new Date(wh.created_at).toLocaleString('id-ID');
+        const is401 = wh.http_code === 401 || wh.status === 'unauthorized';
         const isSuccess = wh.http_code >= 200 && wh.http_code < 300;
         const statusBadge = isSuccess 
             ? `<span class="px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 text-[11px] font-extrabold border border-emerald-200"><i class="fas fa-check-circle mr-1"></i> ${wh.http_code || 200} OK</span>`
+            : is401
+            ? `<span class="px-2.5 py-1 rounded-full bg-amber-100 text-amber-900 text-[11px] font-extrabold border border-amber-300"><i class="fas fa-lock mr-1"></i> 401 UNAUTH</span>`
             : `<span class="px-2.5 py-1 rounded-full bg-red-100 text-red-800 text-[11px] font-extrabold border border-red-200"><i class="fas fa-exclamation-circle mr-1"></i> ${wh.http_code || 500} ERR</span>`;
 
         return `
@@ -241,8 +263,38 @@ adminSocket.on('admin-new-webhook', (newWh) => {
     }
 });
 
+async function loadWebhookSecret() {
+    try {
+        const res = await fetch('/api/admin/webhook-settings');
+        const data = await res.json();
+        if (data.success) {
+            document.getElementById('webhookSecretInput').value = data.webhook_secret_token || '';
+        }
+    } catch (_e) {}
+}
+
+async function saveWebhookSecret() {
+    const val = document.getElementById('webhookSecretInput').value;
+    try {
+        const res = await fetch('/api/admin/webhook-settings', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ webhook_secret_token: val })
+        });
+        const data = await res.json();
+        if (data.success) {
+            showToast(data.message, 'success');
+        } else {
+            showToast(data.message || 'Gagal menyimpan', 'error');
+        }
+    } catch (_e) {
+        showToast('Gagal menghubungi server', 'error');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     fetchWebhooks(1);
+    loadWebhookSecret();
 });
 </script>
 

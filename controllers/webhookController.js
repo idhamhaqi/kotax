@@ -3,18 +3,11 @@ const { parseNotification } = require('../utils/notificationParser');
 const { sendDepositEmail } = require('../services/emailService');
 
 async function handleIncomingNotification(req, res) {
-    // 1. Optional Security Token Check
-    const webhookSecret = process.env.WEBHOOK_SECRET_TOKEN;
-    if (webhookSecret) {
-        const authHeader = req.headers['authorization'];
-        if (!authHeader || authHeader !== webhookSecret) {
-            console.warn('[Webhook] Unauthorized webhook request received from IP:', req.ip);
-            return res.status(401).json({ success: false, message: 'Unauthorized webhook token' });
-        }
-    }
-
-    // Extract fields flexibly from Android Notification JSON payload
+    const io = req.app.get('io');
+    const { logWebhookEvent } = require('./adminController');
+    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
     const body = req.body || {};
+
     const text = body.text || body.message || body.content || body.body || body.notif_text || body.notification || body.ticker || '';
     const title = body.title || body.subject || body.header || '';
     const packageName = body.packageName || body.package || body.package_name || '';
@@ -23,17 +16,76 @@ async function handleIncomingNotification(req, res) {
     const rawTs = body.timestamp || body.time || body.date;
     const notifTimestamp = rawTs ? parseInt(rawTs, 10) : Date.now();
 
-    // Log to Webhook Monitor (webhook_logs) in real-time
-    const { logWebhookEvent } = require('./adminController');
-    const io = req.app.get('io');
-    const ip = req.headers['x-forwarded-for'] || req.socket.remoteAddress || '127.0.0.1';
+    // 1. Fetch Webhook Secret Token from DB settings first (fallback to .env)
+    let webhookSecret = '';
+    try {
+        const [secretRows] = await db.query(
+            "SELECT setting_value FROM settings WHERE setting_key = 'webhook_secret_token' LIMIT 1"
+        );
+        if (secretRows.length > 0 && secretRows[0].setting_value !== null) {
+            webhookSecret = secretRows[0].setting_value.trim();
+        } else {
+            webhookSecret = (process.env.WEBHOOK_SECRET_TOKEN || '').trim();
+        }
+    } catch (_e) {
+        webhookSecret = (process.env.WEBHOOK_SECRET_TOKEN || '').trim();
+    }
 
+    // Clean configured secret by stripping any leading 'Bearer '
+    const cleanConfiguredSecret = webhookSecret.replace(/^Bearer\s+/i, '').trim();
+
+    // Extract incoming authorization token from various potential headers & query params
+    const rawAuthHeader = req.headers['authorization'] ||
+                          req.headers['x-webhook-secret'] ||
+                          req.headers['x-api-key'] ||
+                          req.headers['secret'] ||
+                          req.headers['token'] ||
+                          req.query.secret ||
+                          req.query.token ||
+                          '';
+
+    const cleanIncomingToken = String(rawAuthHeader).replace(/^Bearer\s+/i, '').trim();
+
+    // 2. Perform Secret Token Validation if Configured
+    if (cleanConfiguredSecret !== '') {
+        if (!cleanIncomingToken || cleanIncomingToken !== cleanConfiguredSecret) {
+            console.warn(`[Webhook] 401 Unauthorized attempt from IP ${ip}. Received: "${rawAuthHeader}", Expected: "${cleanConfiguredSecret}"`);
+
+            // ALWAYS LOG 401 Unauthorized attempt to DB so Admin Webhook Monitor sees it live!
+            logWebhookEvent({
+                provider: appName,
+                event_type: 'unauthorized_attempt',
+                status: 'unauthorized',
+                http_code: 401,
+                payload: {
+                    body: body,
+                    received_headers: req.headers,
+                    received_raw_token: rawAuthHeader,
+                    expected_secret: cleanConfiguredSecret
+                },
+                ip_address: String(ip),
+                response_body: `HTTP 401 Unauthorized: Received "${rawAuthHeader || '(none)'}", Expected "${cleanConfiguredSecret}"`,
+                io
+            }).catch(err => console.error('[Webhook Log Error]', err));
+
+            return res.status(401).json({
+                success: false,
+                message: 'Unauthorized webhook token',
+                received_token: rawAuthHeader || null
+            });
+        }
+    }
+
+    // 3. Normal Webhook Logging (HTTP 200 or HTTP 400)
     logWebhookEvent({
         provider: appName,
         event_type: 'android_notification',
         status: text ? 'success' : 'invalid_payload',
         http_code: text ? 200 : 400,
-        payload: body,
+        payload: {
+            body: body,
+            received_headers: req.headers
+        },
         ip_address: String(ip),
         response_body: text ? 'Notification received & logged' : 'Missing notification text',
         io

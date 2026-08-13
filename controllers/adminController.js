@@ -987,6 +987,43 @@ async function logWebhookEvent({ provider = 'PPOB Supplier', event_type = 'trans
     }
 }
 
+// Get Webhook Settings (Secret Token)
+async function getWebhookSettings(req, res) {
+    try {
+        const [rows] = await db.query(
+            "SELECT setting_value FROM settings WHERE setting_key = 'webhook_secret_token' LIMIT 1"
+        );
+        const secretToken = rows.length > 0 ? (rows[0].setting_value || '') : (process.env.WEBHOOK_SECRET_TOKEN || '');
+        res.json({ success: true, webhook_secret_token: secretToken });
+    } catch (error) {
+        console.error('Get webhook settings error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+}
+
+// Update Webhook Settings (Secret Token)
+async function updateWebhookSettings(req, res) {
+    try {
+        const { webhook_secret_token } = req.body;
+        const valToSave = webhook_secret_token !== undefined ? String(webhook_secret_token).trim() : '';
+
+        await db.query(
+            `INSERT INTO settings (setting_key, setting_value)
+             VALUES ('webhook_secret_token', $1)
+             ON CONFLICT (setting_key) DO UPDATE SET setting_value = $2 RETURNING id`,
+            [valToSave, valToSave]
+        );
+
+        res.json({
+            success: true,
+            message: valToSave ? 'Webhook secret token berhasil disimpan' : 'Otentikasi webhook secret token dinonaktifkan'
+        });
+    } catch (error) {
+        console.error('Update webhook settings error:', error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+}
+
 module.exports = {
     getDashboard,
     getUsers,
@@ -1009,5 +1046,7 @@ module.exports = {
     deletePaymentMethod,
     getWebhooksPage,
     getWebhooksAPI,
+    getWebhookSettings,
+    updateWebhookSettings,
     logWebhookEvent
 };
