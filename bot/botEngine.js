@@ -13,6 +13,8 @@ class KuotaxBotEngine extends EventEmitter {
         this.token = null;
         this.cookieHeader = '';
         this.user = null;
+        this.currentAccountIndex = 0;
+
         this.stats = {
             balance: 0,
             holdBalance: 0,
@@ -33,15 +35,24 @@ class KuotaxBotEngine extends EventEmitter {
                     targetUrl: 'https://kuotax.web.id',
                     email: '',
                     password: '',
+                    mode: 'single', // 'single' atau 'multi'
+                    accounts: [],
                     autoStart: false,
                     pollIntervalMs: 1500,
                     minBalanceThreshold: 10000,
                     webPort: 4000
                 };
             }
+
+            if (!Array.isArray(this.config.accounts)) {
+                this.config.accounts = [];
+            }
+            if (!this.config.mode) {
+                this.config.mode = 'single';
+            }
         } catch (err) {
             this.log('error', 'Gagal membaca file config.json: ' + err.message);
-            this.config = { targetUrl: 'https://kuotax.web.id', pollIntervalMs: 1500 };
+            this.config = { targetUrl: 'https://kuotax.web.id', mode: 'single', accounts: [], pollIntervalMs: 1500 };
         }
     }
 
@@ -68,9 +79,12 @@ class KuotaxBotEngine extends EventEmitter {
             config: {
                 targetUrl: this.config.targetUrl,
                 email: this.config.email,
+                mode: this.config.mode || 'single',
+                accounts: this.config.accounts || [],
                 pollIntervalMs: this.config.pollIntervalMs,
                 minBalanceThreshold: this.config.minBalanceThreshold
             },
+            currentAccountIndex: this.currentAccountIndex,
             user: this.user ? {
                 id: this.user.id,
                 full_name: this.user.full_name,
@@ -119,7 +133,6 @@ class KuotaxBotEngine extends EventEmitter {
 
         this.log('success', `Login berhasil! Selamat datang, ${data.user?.full_name || useEmail}`);
         
-        this.saveConfig({ targetUrl: useUrl, email: useEmail, password: usePassword });
         await this.refreshUserStats();
         return data;
     }
@@ -151,8 +164,18 @@ class KuotaxBotEngine extends EventEmitter {
             return;
         }
 
+        this.currentAccountIndex = 0;
+        const mode = this.config.mode || 'single';
+        const accounts = this.config.accounts || [];
+
         try {
-            if (!this.cookieHeader || !this.user) {
+            if (mode === 'multi' && accounts.length > 0) {
+                const firstAcc = accounts[0];
+                this.log('info', `🔀 [MULTI-ACCOUNT MODE] Memulai antrian urutan untuk ${accounts.length} akun...`);
+                this.log('info', `👤 Akun #1/${accounts.length}: ${firstAcc.name || firstAcc.email}`);
+                await this.login(firstAcc.email, firstAcc.password, targetUrl);
+            } else {
+                this.log('info', `👤 [SINGLE ACCOUNT MODE] Menggunakan ${email || this.config.email}`);
                 await this.login(email, password, targetUrl);
             }
 
@@ -208,9 +231,43 @@ class KuotaxBotEngine extends EventEmitter {
         // Check minimum balance threshold
         const minThreshold = Number(this.config.minBalanceThreshold) || 10000;
         if (currentBalance < minThreshold) {
-            this.log('warn', `⚠️ Saldo Utama (Rp ${currentBalance.toLocaleString('id-ID')}) berada di bawah batas minimal (Rp ${minThreshold.toLocaleString('id-ID')}). Bot dihentikan.`);
-            this.stop();
-            return;
+            const mode = this.config.mode || 'single';
+            const accounts = this.config.accounts || [];
+
+            this.log('warn', `⚠️ Saldo Akun #${this.currentAccountIndex + 1} (${this.user?.email || 'User'}) tersisa Rp ${currentBalance.toLocaleString('id-ID')} (di bawah minimum threshold Rp ${minThreshold.toLocaleString('id-ID')}).`);
+
+            // Multi-account Sequential Queue Switch
+            if (mode === 'multi' && accounts.length > 0) {
+                this.currentAccountIndex += 1;
+                if (this.currentAccountIndex < accounts.length) {
+                    const nextAcc = accounts[this.currentAccountIndex];
+                    this.log('info', `🔄 [MULTI-ACCOUNT QUEUE] Memindahkan antrian ke Akun #${this.currentAccountIndex + 1}/${accounts.length}: ${nextAcc.name || nextAcc.email}...`);
+
+                    // Clear previous session data
+                    this.token = null;
+                    this.cookieHeader = '';
+                    this.user = null;
+
+                    try {
+                        await this.login(nextAcc.email, nextAcc.password, this.config.targetUrl);
+                        this.log('success', `🚀 Berhasil beralih ke Akun #${this.currentAccountIndex + 1} (${nextAcc.email}). Memulai pemindaian order...`);
+                        this.emit('status-update', this.getStatus());
+                        return;
+                    } catch (err) {
+                        this.log('error', `Gagal login ke Akun #${this.currentAccountIndex + 1} (${nextAcc.email}): ` + err.message);
+                        // Skip to next if failed
+                        this.scanAndClaim();
+                        return;
+                    }
+                } else {
+                    this.log('success', '🎉 [MULTI-ACCOUNT COMPLETE] SELURUH AKUN DALAM ANTRIAN TELAH SELESAI DIPROSES!');
+                    this.stop();
+                    return;
+                }
+            } else {
+                this.stop();
+                return;
+            }
         }
 
         // 2. Fetch live active market orders from /api/test-orders
@@ -228,7 +285,6 @@ class KuotaxBotEngine extends EventEmitter {
         }
 
         if (!Array.isArray(activeOrders) || activeOrders.length === 0) {
-            // Pasaran sepi / belum ada orderan yang tayang
             return;
         }
 
@@ -240,7 +296,7 @@ class KuotaxBotEngine extends EventEmitter {
         });
 
         if (eligibleOrders.length === 0) {
-            this.log('info', `Terdapat ${activeOrders.length} orderan aktif, tetapi modalnya melebihi Saldo Utama (Rp ${currentBalance.toLocaleString('id-ID')}).`);
+            this.log('info', `Terdapat ${activeOrders.length} orderan aktif, tetapi modalnya melebihi Saldo Utama Akun #${this.currentAccountIndex + 1} (Rp ${currentBalance.toLocaleString('id-ID')}).`);
             return;
         }
 
@@ -257,7 +313,7 @@ class KuotaxBotEngine extends EventEmitter {
 
         // 4. Claim the order (Step 1: fill-order)
         this.isProcessing = true;
-        this.log('info', `⚡ Memproses Order #${targetOrder.id} [${targetOrder.provider} ${targetOrder.quota}GB] | Modal: Rp ${basePrice.toLocaleString('id-ID')} | Profit: +Rp ${expectedProfit.toLocaleString('id-ID')}...`);
+        this.log('info', `⚡ [Akun #${this.currentAccountIndex + 1}] Memproses Order #${targetOrder.id} [${targetOrder.provider} ${targetOrder.quota}GB] | Modal: Rp ${basePrice.toLocaleString('id-ID')} | Profit: +Rp ${expectedProfit.toLocaleString('id-ID')}...`);
 
         try {
             const fillRes = await fetch(`${useUrl}/api/fill-order`, {
@@ -274,8 +330,8 @@ class KuotaxBotEngine extends EventEmitter {
 
             if (fillRes.ok && fillData.success) {
                 // Step 2: Finalize fill-order (complete-fill-order) so profit is credited
-                this.log('info', `⏳ Menyelesaikan verifikasi jaringan Order #${targetOrder.id}...`);
-                await new Promise(r => setTimeout(r, 1000)); // Small realistic delay
+                this.log('info', `⏳ [Akun #${this.currentAccountIndex + 1}] Menyelesaikan verifikasi jaringan Order #${targetOrder.id}...`);
+                await new Promise(r => setTimeout(r, 1000));
 
                 const completeRes = await fetch(`${useUrl}/api/complete-fill-order`, {
                     method: 'POST',
@@ -296,6 +352,7 @@ class KuotaxBotEngine extends EventEmitter {
 
                 const claimItem = {
                     id: targetOrder.id,
+                    accountEmail: this.user?.email || 'Unknown',
                     provider: targetOrder.provider,
                     quota: targetOrder.quota,
                     phoneNumber: targetOrder.phoneNumber,
@@ -308,14 +365,14 @@ class KuotaxBotEngine extends EventEmitter {
 
                 this.claimedHistory.unshift(claimItem);
 
-                this.log('success', `🎉 SUKSES KLAIM & SELESAI ORDER #${targetOrder.id}! Profit: +Rp ${expectedProfit.toLocaleString('id-ID')} | Saldo Utama Sisa: Rp ${Number(this.stats.balance).toLocaleString('id-ID')}`);
+                this.log('success', `🎉 [Akun #${this.currentAccountIndex + 1}] SUKSES KLAIM ORDER #${targetOrder.id}! Profit: +Rp ${expectedProfit.toLocaleString('id-ID')} | Saldo Sisa: Rp ${Number(this.stats.balance).toLocaleString('id-ID')}`);
                 this.emit('order-claimed', claimItem);
                 this.emit('status-update', this.getStatus());
             } else {
-                this.log('warn', `Order #${targetOrder.id} tidak dapat diklaim: ${fillData.message || 'Sudah diambil user lain'}`);
+                this.log('warn', `[Akun #${this.currentAccountIndex + 1}] Order #${targetOrder.id} tidak dapat diklaim: ${fillData.message || 'Sudah diambil user lain'}`);
             }
         } catch (err) {
-            this.log('error', `Error saat proses klaim Order #${targetOrder.id}: ` + err.message);
+            this.log('error', `[Akun #${this.currentAccountIndex + 1}] Error saat klaim Order #${targetOrder.id}: ` + err.message);
         } finally {
             this.isProcessing = false;
         }

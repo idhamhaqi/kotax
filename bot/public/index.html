@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kuotax Auto-Order Bot Panel</title>
+    <title>Kuotax Multi-Account Auto-Order Bot Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -18,13 +18,13 @@
         <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 text-slate-950 flex items-center justify-center font-black text-xl shadow-lg shadow-emerald-500/20">
-                    <i class="fas fa-robot"></i>
+                    <i class="fas fa-users-gear"></i>
                 </div>
                 <div>
                     <h1 class="font-extrabold text-lg text-white tracking-tight flex items-center gap-2">
-                        KUOTAX <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">Auto-Order Bot</span>
+                        KUOTAX <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-bold">Multi-Account Bot</span>
                     </h1>
-                    <p class="text-xs text-slate-400">Automated Order Scanner & Claimer Engine</p>
+                    <p class="text-xs text-slate-400">Automated Sequential Queue Order Engine</p>
                 </div>
             </div>
 
@@ -43,13 +43,13 @@
             <div class="bg-slate-950/60 rounded-2xl p-5 border border-slate-800/80 shadow-xl relative overflow-hidden group">
                 <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-all"></div>
                 <div class="flex items-center justify-between mb-3">
-                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Saldo Utama User</span>
+                    <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Saldo Aktif Saat Ini</span>
                     <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-sm">
                         <i class="fas fa-wallet"></i>
                     </div>
                 </div>
                 <p id="statBalance" class="text-2xl lg:text-3xl font-extrabold text-emerald-400 font-mono">Rp 0</p>
-                <p class="text-[11px] text-slate-500 mt-1">Status Saldo Real-Time</p>
+                <p id="statAccountEmail" class="text-[11px] text-slate-400 mt-1 truncate">Akun: -</p>
             </div>
 
             <!-- Total Order Claimed -->
@@ -79,31 +79,62 @@
             </div>
         </div>
 
-        <!-- Controls & Configuration Grid -->
+        <!-- Mode & Configuration Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- Left Panel: Form Settings & Control Button (5 Cols) -->
-            <div class="lg:col-span-5 bg-slate-950/70 rounded-2xl p-6 border border-slate-800 shadow-xl space-y-4">
-                <h2 class="text-base font-bold text-white flex items-center gap-2 border-b border-slate-800/80 pb-3">
-                    <i class="fas fa-sliders text-emerald-400"></i> Pengaturan Bot & Login
-                </h2>
+            <!-- Left Panel: Form Settings & Accounts Manager (6 Cols) -->
+            <div class="lg:col-span-6 bg-slate-950/70 rounded-2xl p-6 border border-slate-800 shadow-xl space-y-5">
+                <div class="flex items-center justify-between border-b border-slate-800/80 pb-3">
+                    <h2 class="text-base font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-sliders text-emerald-400"></i> Mode Eksekusi Bot
+                    </h2>
+                    
+                    <!-- Mode Switcher Tabs -->
+                    <div class="inline-flex p-1 bg-slate-900 border border-slate-800 rounded-xl">
+                        <button type="button" onclick="setExecutionMode('single')" id="tabModeSingle" class="px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-500 text-slate-950">
+                            Single
+                        </button>
+                        <button type="button" onclick="setExecutionMode('multi')" id="tabModeMulti" class="px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white">
+                            Multi-Account
+                        </button>
+                    </div>
+                </div>
 
-                <form id="botConfigForm" class="space-y-3.5">
+                <form id="botConfigForm" class="space-y-4">
                     <div>
                         <label class="block text-xs font-semibold text-slate-300 mb-1">Target Web Application URL</label>
                         <input type="url" id="targetUrl" required value="https://kuotax.web.id"
                             class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 font-semibold focus:border-emerald-500 focus:outline-none transition">
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Email Akun Kuotax</label>
-                        <input type="email" id="email" required placeholder="user@domain.com"
-                            class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 font-semibold focus:border-emerald-500 focus:outline-none transition">
+                    <!-- Single Account Mode Inputs -->
+                    <div id="singleAccountSection" class="space-y-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Email Akun Kuotax</label>
+                            <input type="email" id="email" placeholder="user@domain.com"
+                                class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 font-semibold focus:border-emerald-500 focus:outline-none transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-300 mb-1">Password Akun Kuotax</label>
+                            <input type="password" id="password" placeholder="••••••••"
+                                class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 font-semibold focus:border-emerald-500 focus:outline-none transition">
+                        </div>
                     </div>
 
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">Password Akun Kuotax</label>
-                        <input type="password" id="password" required placeholder="••••••••"
-                            class="w-full bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2.5 text-xs text-slate-200 font-semibold focus:border-emerald-500 focus:outline-none transition">
+                    <!-- Multi Account Mode Manager -->
+                    <div id="multiAccountSection" class="hidden space-y-3 border-t border-b border-slate-800/80 py-3">
+                        <div class="flex items-center justify-between">
+                            <label class="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                                <i class="fas fa-layer-group text-purple-400"></i> Antrian Akun Berurutan (Queue)
+                            </label>
+                            <button type="button" onclick="addAccountRow()" class="px-2.5 py-1 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 text-[11px] font-bold rounded-lg transition border border-emerald-500/30">
+                                <i class="fas fa-plus mr-1"></i> Tambah Akun
+                            </button>
+                        </div>
+
+                        <div id="accountsListContainer" class="space-y-2.5 max-h-[220px] overflow-y-auto pr-1">
+                            <!-- Account rows rendered dynamically -->
+                        </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 pt-1">
@@ -128,8 +159,8 @@
                 </form>
             </div>
 
-            <!-- Right Panel: Live Terminal Logs (7 Cols) -->
-            <div class="lg:col-span-7 bg-slate-950/70 rounded-2xl p-5 border border-slate-800 shadow-xl flex flex-col justify-between">
+            <!-- Right Panel: Live Terminal Logs (6 Cols) -->
+            <div class="lg:col-span-6 bg-slate-950/70 rounded-2xl p-5 border border-slate-800 shadow-xl flex flex-col justify-between">
                 <div class="flex items-center justify-between border-b border-slate-800/80 pb-3 mb-3">
                     <h2 class="text-base font-bold text-white flex items-center gap-2">
                         <i class="fas fa-terminal text-emerald-400"></i> Terminal Log Stream
@@ -139,8 +170,8 @@
                     </button>
                 </div>
 
-                <div id="terminalLogBox" class="bg-slate-950 font-mono text-xs p-4 rounded-xl border border-slate-800/90 h-[280px] overflow-y-auto space-y-1.5 scrollbar-thin scrollbar-thumb-slate-700">
-                    <div class="text-slate-500 italic">[SYSTEM] Terminal siap. Klik 'JALANKAN BOT' untuk memulai pemindaian orderan otomatis.</div>
+                <div id="terminalLogBox" class="bg-slate-950 font-mono text-xs p-4 rounded-xl border border-slate-800/90 h-[340px] overflow-y-auto space-y-1.5 scrollbar-thin scrollbar-thumb-slate-700">
+                    <div class="text-slate-500 italic">[SYSTEM] Terminal siap. Pilih mode Single / Multi-Account lalu klik 'JALANKAN BOT'.</div>
                 </div>
             </div>
         </div>
@@ -156,11 +187,11 @@
                     <thead>
                         <tr class="border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
                             <th class="py-3 px-3">Waktu</th>
+                            <th class="py-3 px-3">Akun Executed</th>
                             <th class="py-3 px-3">Order ID</th>
                             <th class="py-3 px-3">Provider & Kuota</th>
                             <th class="py-3 px-3">No. HP</th>
                             <th class="py-3 px-3">Modal Order</th>
-                            <th class="py-3 px-3">Harga Jual</th>
                             <th class="py-3 px-3">Profit</th>
                         </tr>
                     </thead>
@@ -176,9 +207,73 @@
 
     <script>
         let isRunningState = false;
+        let activeMode = 'single';
+        let multiAccounts = [];
 
         function formatRupiah(num) {
             return 'Rp ' + parseInt(num || 0).toLocaleString('id-ID');
+        }
+
+        function setExecutionMode(mode) {
+            activeMode = mode;
+            const singleTab = document.getElementById('tabModeSingle');
+            const multiTab = document.getElementById('tabModeMulti');
+            const singleSec = document.getElementById('singleAccountSection');
+            const multiSec = document.getElementById('multiAccountSection');
+
+            if (mode === 'multi') {
+                singleTab.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
+                multiTab.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-500 text-slate-950';
+                singleSec.classList.add('hidden');
+                multiSec.classList.remove('hidden');
+
+                if (multiAccounts.length === 0) {
+                    addAccountRow('Akun 1', '', '');
+                    addAccountRow('Akun 2', '', '');
+                }
+            } else {
+                multiTab.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition text-slate-400 hover:text-white';
+                singleTab.className = 'px-3 py-1.5 rounded-lg text-xs font-bold transition bg-emerald-500 text-slate-950';
+                multiSec.classList.add('hidden');
+                singleSec.classList.remove('hidden');
+            }
+        }
+
+        function addAccountRow(name = '', email = '', password = '') {
+            const container = document.getElementById('accountsListContainer');
+            const index = container.children.length + 1;
+            const row = document.createElement('div');
+            row.className = 'account-row flex items-center gap-2 bg-slate-900/90 p-2.5 rounded-xl border border-slate-800';
+            row.innerHTML = `
+                <span class="text-xs font-bold text-emerald-400 w-5 shrink-0">#${index}</span>
+                <input type="text" placeholder="Nama Akun (opsional)" value="${escapeHtml(name)}" class="acc-name w-1/4 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-200 focus:outline-none">
+                <input type="email" placeholder="Email Kuotax" value="${escapeHtml(email)}" class="acc-email flex-1 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-200 focus:outline-none">
+                <input type="password" placeholder="Password" value="${escapeHtml(password)}" class="acc-password w-1/4 bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-[11px] text-slate-200 focus:outline-none">
+                <button type="button" onclick="this.closest('.account-row').remove(); reindexAccountRows();" class="text-slate-500 hover:text-rose-400 p-1 transition"><i class="fas fa-trash-alt text-xs"></i></button>
+            `;
+            container.appendChild(row);
+        }
+
+        function reindexAccountRows() {
+            const rows = document.querySelectorAll('.account-row');
+            rows.forEach((row, idx) => {
+                const badge = row.querySelector('span');
+                if (badge) badge.textContent = `#${idx + 1}`;
+            });
+        }
+
+        function getMultiAccountsData() {
+            const rows = document.querySelectorAll('.account-row');
+            const list = [];
+            rows.forEach((row, idx) => {
+                const name = row.querySelector('.acc-name').value.trim() || `Akun #${idx + 1}`;
+                const email = row.querySelector('.acc-email').value.trim();
+                const password = row.querySelector('.acc-password').value.trim();
+                if (email && password) {
+                    list.push({ name, email, password });
+                }
+            });
+            return list;
         }
 
         function appendLog(item) {
@@ -223,7 +318,9 @@
 
             if (status.isRunning) {
                 badge.className = 'px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-extrabold border border-emerald-500/30 flex items-center gap-2';
-                badge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span><span>BOT ACTIVE / SCANNING</span>';
+                const queueIdx = (status.currentAccountIndex || 0) + 1;
+                const totalAcc = status.config?.accounts?.length || 1;
+                badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span><span>BOT ACTIVE (Akun ${queueIdx}/${totalAcc})</span>`;
 
                 btn.className = 'flex-1 py-3.5 rounded-xl bg-rose-500 hover:bg-rose-600 active:scale-98 text-white font-extrabold text-sm transition shadow-lg shadow-rose-500/20 flex items-center justify-center gap-2';
                 btn.innerHTML = '<i class="fas fa-stop"></i> HENTIKAN BOT';
@@ -240,6 +337,21 @@
                 if (status.config.email) document.getElementById('email').value = status.config.email;
                 if (status.config.pollIntervalMs) document.getElementById('pollIntervalMs').value = status.config.pollIntervalMs;
                 if (status.config.minBalanceThreshold) document.getElementById('minBalanceThreshold').value = status.config.minBalanceThreshold;
+
+                if (status.config.mode && status.config.mode !== activeMode) {
+                    setExecutionMode(status.config.mode);
+                }
+
+                if (Array.isArray(status.config.accounts) && status.config.accounts.length > 0) {
+                    multiAccounts = status.config.accounts;
+                    renderAccountsList(multiAccounts);
+                }
+            }
+
+            if (status.user) {
+                document.getElementById('statAccountEmail').textContent = 'Akun: ' + status.user.email;
+            } else {
+                document.getElementById('statAccountEmail').textContent = 'Akun: -';
             }
 
             if (status.stats) {
@@ -253,6 +365,15 @@
             }
         }
 
+        function renderAccountsList(accounts) {
+            const container = document.getElementById('accountsListContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            accounts.forEach((acc, idx) => {
+                addAccountRow(acc.name || `Akun #${idx + 1}`, acc.email || '', acc.password || '');
+            });
+        }
+
         function renderClaimedTable(history) {
             const tbody = document.getElementById('claimedHistoryTable');
             if (!history || history.length === 0) {
@@ -263,11 +384,11 @@
             tbody.innerHTML = history.map(item => `
                 <tr class="hover:bg-slate-900/50 transition">
                     <td class="py-3 px-3 text-slate-400">${item.claimedAt}</td>
-                    <td class="py-3 px-3 font-bold text-emerald-400">#${item.id}</td>
+                    <td class="py-3 px-3 text-emerald-400 font-bold">${escapeHtml(item.accountEmail || '-')}</td>
+                    <td class="py-3 px-3 font-bold text-slate-200">#${item.id}</td>
                     <td class="py-3 px-3 text-slate-200"><span class="px-2 py-0.5 bg-slate-800 rounded font-bold">${escapeHtml(item.provider)}</span> ${item.quota}GB</td>
                     <td class="py-3 px-3 text-slate-400">${escapeHtml(item.phoneNumber)}</td>
                     <td class="py-3 px-3 text-slate-300">${formatRupiah(item.basePrice)}</td>
-                    <td class="py-3 px-3 text-slate-300">${formatRupiah(item.price)}</td>
                     <td class="py-3 px-3 font-bold text-amber-400">+${formatRupiah(item.profit)}</td>
                 </tr>
             `).join('');
@@ -275,7 +396,6 @@
 
         async function toggleBotEngine() {
             if (isRunningState) {
-                // Stop
                 try {
                     const res = await fetch('/api/stop', { method: 'POST' });
                     const data = await res.json();
@@ -284,23 +404,44 @@
                     alert('Gagal menghentikan bot: ' + err.message);
                 }
             } else {
-                // Start
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value.trim();
                 const targetUrl = document.getElementById('targetUrl').value.trim();
                 const pollIntervalMs = parseInt(document.getElementById('pollIntervalMs').value) || 1500;
                 const minBalanceThreshold = parseInt(document.getElementById('minBalanceThreshold').value) || 10000;
+                
+                let email = '';
+                let password = '';
+                let accounts = [];
 
-                if (!email || !password) {
-                    alert('Harap isi Email dan Password Anda!');
-                    return;
+                if (activeMode === 'multi') {
+                    accounts = getMultiAccountsData();
+                    if (accounts.length === 0) {
+                        alert('Harap masukkan minimal 1 Email & Password akun dalam antrian!');
+                        return;
+                    }
+                    email = accounts[0].email;
+                    password = accounts[0].password;
+                } else {
+                    email = document.getElementById('email').value.trim();
+                    password = document.getElementById('password').value.trim();
+                    if (!email || !password) {
+                        alert('Harap isi Email dan Password Anda!');
+                        return;
+                    }
                 }
 
                 // Save config first
                 await fetch('/api/config', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ targetUrl, email, password, pollIntervalMs, minBalanceThreshold })
+                    body: JSON.stringify({
+                        targetUrl,
+                        email,
+                        password,
+                        mode: activeMode,
+                        accounts,
+                        pollIntervalMs,
+                        minBalanceThreshold
+                    })
                 });
 
                 try {
