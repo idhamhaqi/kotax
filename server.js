@@ -140,7 +140,7 @@ app.use(async (req, res, next) => {
         return next();
     }
     const now = Date.now();
-    if (now - gaLastFetch > 30000) {
+    if (now - gaLastFetch > 5000) {
         try {
             const [rows] = await db.query("SELECT setting_value FROM settings WHERE setting_key = 'google_analytics_script'");
             cachedGaScript = rows.length > 0 ? (rows[0].setting_value || '') : '';
