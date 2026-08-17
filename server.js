@@ -172,6 +172,8 @@ app.get('/forgot-password', checkAuth, (req, res) => res.render('forgot-password
 app.get('/reset-password', (req, res) => res.render('reset-password', { token: req.query.token || '' }));
 app.get('/terms', (req, res) => res.render('terms'));
 app.get('/privacy', (req, res) => res.render('privacy'));
+app.get('/sitemap.xml', (req, res) => res.sendFile(path.join(__dirname, 'public', 'sitemap.xml')));
+app.get('/robots.txt', (req, res) => res.sendFile(path.join(__dirname, 'public', 'robots.txt')));
 app.use('/mitra', require('./routes/mitra'));
 
 // Routes - Protected pages
