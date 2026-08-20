@@ -232,23 +232,23 @@
                         </h4>
 
                         <!-- QRIS QR Code Image Container -->
-                        <div id="modalQrisContainer" class="hidden text-center my-2.5 p-3.5 bg-white rounded-2xl border border-purple-200 shadow-md">
-                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-extrabold uppercase tracking-wider mb-2.5">
+                        <div id="modalQrisContainer" class="hidden text-center my-2.5 p-3.5 bg-white rounded-2xl border border-emerald-100 shadow-sm">
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-extrabold uppercase tracking-wider mb-2.5">
                                 <i class="fas fa-qrcode"></i> Scan QRIS Di Bawah Ini
                             </span>
-                            <div class="relative inline-block p-2.5 bg-white rounded-2xl border-2 border-purple-300 shadow-inner">
+                            <div class="relative inline-block p-2.5 bg-white rounded-2xl border-2 border-emerald-300 shadow-inner">
                                 <img id="modalQrCodeImg" src="" alt="QRIS Code" class="w-56 h-56 sm:w-64 sm:h-64 object-contain mx-auto rounded-xl">
                             </div>
-                            <p id="modalQrisHint" class="text-xs font-semibold text-purple-700 mt-2 flex items-center justify-center gap-1 whitespace-nowrap overflow-hidden text-ellipsis">
+                            <p id="modalQrisHint" class="text-xs font-semibold text-emerald-700 mt-2 flex items-center justify-center gap-1 whitespace-nowrap overflow-hidden text-ellipsis">
                                 <i class="fas fa-check-circle text-emerald-500"></i> Nominal otomatis terisi
                             </p>
-                            <button type="button" onclick="downloadQrisImage()" class="mt-2.5 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs shadow-md transition active:scale-95">
+                            <button type="button" onclick="downloadQrisImage()" class="mt-2.5 inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white font-bold text-xs shadow-md transition active:scale-95">
                                 <i class="fas fa-download"></i> Simpan / Download QRIS
                             </button>
                         </div>
 
                         <div class="space-y-2.5 text-xs sm:text-sm">
-                            <div class="flex justify-between items-center">
+                            <div id="modalMethodRow" class="flex justify-between items-center">
                                 <span class="text-gray-500 font-medium">Metode Pembayaran:</span>
                                 <span class="font-bold text-gray-900" id="modalBankName"></span>
                             </div>
@@ -263,7 +263,7 @@
                                 </div>
                             </div>
 
-                            <div class="flex justify-between items-center">
+                            <div id="modalAccountHolderRow" class="flex justify-between items-center">
                                 <span class="text-gray-500 font-medium">Atas Nama:</span>
                                 <span class="font-bold text-gray-900" id="modalAccountHolder"></span>
                             </div>
@@ -725,7 +725,10 @@
                 if (modalBadge) modalBadge.textContent = pm.category || 'Aktif';
 
                 const qrisContainer = document.getElementById('modalQrisContainer');
+                const methodRow = document.getElementById('modalMethodRow');
                 const accRow = document.getElementById('modalAccountNumberRow');
+                const holderRow = document.getElementById('modalAccountHolderRow');
+                const amountBox = document.getElementById('modalUniqueAmountBox');
 
                 const qrisUrl = deposit.qrisDataUrl || pm.qrCodeUrl;
                 const isDynamic = deposit.isDynamicQris || pm.isDynamicQris;
@@ -739,16 +742,23 @@
                         if (isDynamic) {
                             hintEl.innerHTML = '<i class="fas fa-check-circle text-emerald-500"></i> Nominal Rp ' + formatUniqueAmount(deposit.uniqueAmount) + ' otomatis terisi';
                         } else {
-                            hintEl.innerHTML = '<i class="fas fa-info-circle text-purple-500"></i> Masukkan Rp ' + formatUniqueAmount(deposit.uniqueAmount) + ' saat transfer';
+                            hintEl.innerHTML = '<i class="fas fa-info-circle text-emerald-600"></i> Masukkan Rp ' + formatUniqueAmount(deposit.uniqueAmount) + ' saat transfer';
                         }
                     }
+                    // Hide redundant rows for QRIS to keep UI clean and simple
+                    if (methodRow) methodRow.classList.add('hidden');
                     if (accRow) accRow.classList.add('hidden');
+                    if (holderRow) holderRow.classList.add('hidden');
+                    if (amountBox) amountBox.classList.add('hidden');
                 } else {
                     qrisContainer.classList.add('hidden');
+                    if (methodRow) methodRow.classList.remove('hidden');
                     if (accRow) {
                         accRow.classList.remove('hidden');
                         document.getElementById('modalBankAccount').textContent = pm.accountNumber || '-';
                     }
+                    if (holderRow) holderRow.classList.remove('hidden');
+                    if (amountBox) amountBox.classList.remove('hidden');
                 }
             } else {
                 paymentInfo.classList.add('hidden');
