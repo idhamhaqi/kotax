@@ -518,51 +518,67 @@
     }
 
     // ==========================================
-    // Referral code real-time validation
+    // Referral code real-time validation (per-input isolated)
     // ==========================================
-    let referralTimeout = null;
-    let referralValid = false;
+    function validateReferralInput(input) {
+        const code = input.value.trim();
+        const form = input.closest('form');
+        if (!form) return;
+        const statusEl = form.querySelector('.ref-status');
+        const submitBtns = form.querySelectorAll('.submit-btn');
+
+        if (input._refTimeout) {
+            clearTimeout(input._refTimeout);
+        }
+
+        if (!code) {
+            if (statusEl) statusEl.innerHTML = '';
+            form.dataset.referralValid = "false";
+            submitBtns.forEach(b => b.disabled = true);
+            return;
+        }
+
+        if (statusEl) {
+            statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memeriksa...';
+            statusEl.className = 'ref-status loading';
+        }
+        submitBtns.forEach(b => b.disabled = true);
+
+        input._refTimeout = setTimeout(async () => {
+            try {
+                const res = await fetch('/api/auth/check-referral?code=' + encodeURIComponent(code));
+                const result = await res.json();
+
+                if (result.success) {
+                    if (statusEl) {
+                        statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Valid — diundang oleh ' + result.owner;
+                        statusEl.className = 'ref-status valid';
+                    }
+                    form.dataset.referralValid = "true";
+                    submitBtns.forEach(b => b.disabled = false);
+                } else {
+                    if (statusEl) {
+                        statusEl.innerHTML = '<i class="fas fa-times-circle"></i> ' + (result.message || 'Kode undangan tidak valid');
+                        statusEl.className = 'ref-status invalid';
+                    }
+                    form.dataset.referralValid = "false";
+                    submitBtns.forEach(b => b.disabled = true);
+                }
+            } catch (e) {
+                if (statusEl) {
+                    statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Gagal memeriksa';
+                    statusEl.className = 'ref-status invalid';
+                }
+                form.dataset.referralValid = "false";
+                submitBtns.forEach(b => b.disabled = true);
+            }
+        }, 300);
+    }
 
     function initReferralValidation() {
         document.querySelectorAll('.referral-input').forEach(input => {
             input.addEventListener('input', function() {
-                const code = this.value.trim();
-                const form = this.closest('form');
-                const statusEl = form.querySelector('.ref-status');
-                const submitBtns = form.querySelectorAll('.submit-btn');
-
-                clearTimeout(referralTimeout);
-                referralValid = false;
-                submitBtns.forEach(b => b.disabled = true);
-
-                if (!code) {
-                    if (statusEl) statusEl.innerHTML = '';
-                    return;
-                }
-
-                if (statusEl) statusEl.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Memeriksa...';
-                if (statusEl) statusEl.className = 'ref-status loading';
-
-                referralTimeout = setTimeout(async () => {
-                    try {
-                        const res = await fetch('/api/auth/check-referral?code=' + encodeURIComponent(code));
-                        const result = await res.json();
-
-                        if (result.success) {
-                            if (statusEl) statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Valid — diundang oleh ' + result.owner;
-                            if (statusEl) statusEl.className = 'ref-status valid';
-                            referralValid = true;
-                            submitBtns.forEach(b => b.disabled = false);
-                        } else {
-                            if (statusEl) statusEl.innerHTML = '<i class="fas fa-times-circle"></i> ' + result.message;
-                            if (statusEl) statusEl.className = 'ref-status invalid';
-                            referralValid = false;
-                        }
-                    } catch (e) {
-                        if (statusEl) statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i> Gagal memeriksa';
-                        if (statusEl) statusEl.className = 'ref-status invalid';
-                    }
-                }, 500);
+                validateReferralInput(this);
             });
         });
     }
@@ -642,8 +658,8 @@
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
 
-                if (!referralValid) {
-                    showToast('Kode referral harus valid sebelum mendaftar', 'error');
+                if (form.dataset.referralValid !== "true") {
+                    showToast('Kode undangan harus valid sebelum mendaftar', 'error');
                     return;
                 }
 
@@ -722,7 +738,7 @@
                 input.readOnly = true;
                 input.classList.add('bg-slate-100', 'cursor-not-allowed', 'font-mono', 'font-bold', 'text-emerald-700', 'border-emerald-300');
                 
-                input.dispatchEvent(new Event('input')); // Trigger validation
+                validateReferralInput(input); // Trigger validation directly per input
             });
             if (urlRefCode) {
                 window.history.replaceState({}, document.title, window.location.pathname);
