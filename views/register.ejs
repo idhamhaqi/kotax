@@ -215,9 +215,9 @@
                         </div>
                     </div>
 
-                    <!-- Step 3: Password & Referral -->
+                    <!-- Step 3: Password & Kode Undangan -->
                     <div class="step-panel" data-step="3">
-                        <h3 class="text-sm font-bold text-gray-800 mb-4">Password & Referral</h3>
+                        <h3 class="text-sm font-bold text-gray-800 mb-4">Password & Kode Undangan</h3>
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Password</label>
@@ -246,8 +246,8 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Kode Referral <span class="text-red-500">*Wajib</span></label>
-                                <input type="text" name="referral_code" id="referralCodeMobile" required class="reg-input referral-input" placeholder="Masukkan kode referral">
+                                <label class="block text-gray-600 text-[11px] font-bold mb-1.5 uppercase tracking-wide">Kode Undangan <span class="text-red-500">*Wajib</span></label>
+                                <input type="text" name="referral_code" id="referralCodeMobile" required class="reg-input referral-input" placeholder="Masukkan kode undangan">
                                 <div id="referralStatusMobile" class="ref-status"></div>
                             </div>
                         </div>
@@ -390,10 +390,10 @@
                         </div>
                     </div>
 
-                    <!-- Row 6: Referral -->
+                    <!-- Row 6: Kode Undangan -->
                     <div>
-                        <label class="block text-gray-700 text-xs font-bold mb-1.5">Kode Referral <span class="text-red-500">*Wajib</span></label>
-                        <input type="text" name="referral_code" id="referralCodeDesktop" required class="reg-input referral-input" placeholder="Masukkan kode referral">
+                        <label class="block text-gray-700 text-xs font-bold mb-1.5">Kode Undangan <span class="text-red-500">*Wajib</span></label>
+                        <input type="text" name="referral_code" id="referralCodeDesktop" required class="reg-input referral-input" placeholder="Masukkan kode undangan">
                         <div id="referralStatusDesktop" class="ref-status"></div>
                     </div>
 
@@ -549,7 +549,7 @@
                         const result = await res.json();
 
                         if (result.success) {
-                            if (statusEl) statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Valid — direferensikan oleh ' + result.owner;
+                            if (statusEl) statusEl.innerHTML = '<i class="fas fa-check-circle"></i> Valid — diundang oleh ' + result.owner;
                             if (statusEl) statusEl.className = 'ref-status valid';
                             referralValid = true;
                             submitBtns.forEach(b => b.disabled = false);
